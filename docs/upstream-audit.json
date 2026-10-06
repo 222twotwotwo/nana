@@ -1,0 +1,380 @@
+{
+  "checkedAt": "2026-10-05T11:12:47.225Z",
+  "scope": "仓库版本、规则格式和源站首页连通性；首页成功不代表可读，完整链路见 data/health.json",
+  "repositories": [
+    {
+      "repo": "XIU2/Yuedu",
+      "url": "https://github.com/XIU2/Yuedu",
+      "pushedAt": "2026-08-14T11:46:04Z",
+      "fileSha": "2023f8ca9286912b99f0260ca4b1a72047e89016",
+      "license": "GPL-3.0",
+      "count": 22,
+      "sources": [
+        {
+          "name": "起点中文",
+          "url": "https://www.qidian.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 202,
+          "finalUrl": "https://www.qidian.com/"
+        },
+        {
+          "name": "酷我小说",
+          "url": "http://appi.kuwo.cn",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://appi.kuwo.cn/"
+        },
+        {
+          "name": "速读谷",
+          "url": "https://www.sudugu.co",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "ECONNRESET"
+        },
+        {
+          "name": "69书吧.com",
+          "url": "https://www.69shuba.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 403,
+          "finalUrl": "https://www.69shuba.com/"
+        },
+        {
+          "name": "番茄小说2",
+          "url": "https://fqapi.komr.cn",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 429,
+          "finalUrl": "https://fqapi.komr.cn/"
+        },
+        {
+          "name": "69书吧",
+          "url": "https://69shuba.cx",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 403,
+          "finalUrl": "https://www.69shuba.com/"
+        },
+        {
+          "name": "天天看小说",
+          "url": "https://cn.ttkan.co",
+          "containsJs": false,
+          "readability": "未作完整链路验证",
+          "httpStatus": 403,
+          "finalUrl": "https://cn.ttkan.co/"
+        },
+        {
+          "name": "铅笔小说",
+          "url": "https://www.23qb.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 403,
+          "finalUrl": "https://www.23qb.com/"
+        },
+        {
+          "name": "来看文学",
+          "url": "https://m.laikan9.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://m.laikan9.com/"
+        },
+        {
+          "name": "独步小说网",
+          "url": "https://www.dbxsd.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://www.dbxsd.com/index.html"
+        },
+        {
+          "name": "和图书",
+          "url": "https://hetushu.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 403,
+          "finalUrl": "https://hetushu.com/"
+        },
+        {
+          "name": "大文学无错小说网",
+          "url": "https://www.wcxsw.org",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 403,
+          "finalUrl": "https://www.wcxsw.org/"
+        },
+        {
+          "name": "得奇小说网",
+          "url": "https://www.deqixs.com",
+          "containsJs": false,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://www.deqixs.com/"
+        },
+        {
+          "name": "思路客",
+          "url": "https://www.siluke.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://www.siluke.com/"
+        },
+        {
+          "name": "阅友小说",
+          "url": "http://m.suixkan.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "http://m.suixkan.com/"
+        },
+        {
+          "name": "就爱文学",
+          "url": "http://www.92xs.info",
+          "containsJs": false,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "http://www.92xs.info/"
+        },
+        {
+          "name": "八一中文",
+          "url": "https://www.81zw2.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 403,
+          "finalUrl": "https://www.81zw2.com/"
+        },
+        {
+          "name": "武林中文网",
+          "url": "https://www.50zw.so",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "ENOTFOUND"
+        },
+        {
+          "name": "快书网",
+          "url": "https://www.kuaishu5.com",
+          "containsJs": false,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        },
+        {
+          "name": "手机小说",
+          "url": "https://www.shoujix.com",
+          "containsJs": false,
+          "readability": "未作完整链路验证",
+          "error": "The operation was aborted due to timeout"
+        },
+        {
+          "name": "顶点小说 ddxs",
+          "url": "https://www.ddxs.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        },
+        {
+          "name": "艾途小说",
+          "url": "https://m.aitbooks.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        }
+      ]
+    },
+    {
+      "repo": "chashaomanhua/manhuadaquan",
+      "url": "https://github.com/chashaomanhua/manhuadaquan",
+      "pushedAt": "2022-10-11T02:27:40Z",
+      "fileSha": "1ab1791a2f0f9d0a169056ee68eb2e51586b1631",
+      "license": null,
+      "count": 25,
+      "sources": [
+        {
+          "name": "漫画人",
+          "url": "http://www.manhuaren.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://www.manhuaren.com/"
+        },
+        {
+          "name": "奇热漫画",
+          "url": "https://m.qiremanhua.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "ENOTFOUND"
+        },
+        {
+          "name": "咪咕动漫",
+          "url": "http://m.migudm.cn",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://m.migudm.cn/"
+        },
+        {
+          "name": "极速漫画",
+          "url": "http://www.1kkk.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://www.1kkk.com/"
+        },
+        {
+          "name": "6漫画",
+          "url": "http://www.6mh7.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://www.6mh7.com/"
+        },
+        {
+          "name": "动漫之家v3₁",
+          "url": "http://v3api.dmzj.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 404,
+          "finalUrl": "https://webblock.volcengine.com/"
+        },
+        {
+          "name": "动漫之家₂-M",
+          "url": "https://api.dmzj1.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UNABLE_TO_GET_ISSUER_CERT_LOCALLY"
+        },
+        {
+          "name": "漫画台🅰",
+          "url": "https://m.manhuatai.com/api",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "CERT_HAS_EXPIRED"
+        },
+        {
+          "name": "酷漫屋",
+          "url": "http://m.kuman55.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 404,
+          "finalUrl": "http://www.kuman55.com/"
+        },
+        {
+          "name": "神漫画",
+          "url": "https://m.taomanhua.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "CERT_HAS_EXPIRED"
+        },
+        {
+          "name": "6漫画",
+          "url": "http://www.sixmh6.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 404,
+          "finalUrl": "http://www.sixmh6.com/"
+        },
+        {
+          "name": "动漫之家₁-M",
+          "url": "https://m.dmzj1.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UNABLE_TO_GET_ISSUER_CERT_LOCALLY"
+        },
+        {
+          "name": "爱米推漫画",
+          "url": "https://m.imitui.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "EAI_AGAIN"
+        },
+        {
+          "name": "鬼萝莉漫画",
+          "url": "http://www.gllmh.com",
+          "containsJs": false,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://8hpj.xdxjofalzgmgfotfjrecwrpttn.com/ns2gw/78976/mp2ga3"
+        },
+        {
+          "name": "非麻瓜",
+          "url": "https://www.fmgmh.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        },
+        {
+          "name": "布卡漫画 ",
+          "url": "http://www.buka.cn",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        },
+        {
+          "name": "动漫之家",
+          "url": "https://m.dmzj.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "ECONNRESET"
+        },
+        {
+          "name": "土豆漫画网",
+          "url": "https://m.xm124.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "ENOTFOUND"
+        },
+        {
+          "name": "147漫画网",
+          "url": "https://m.i2356.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "DEPTH_ZERO_SELF_SIGNED_CERT"
+        },
+        {
+          "name": "517漫画",
+          "url": "http://m.517mh.net",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "ENOTFOUND"
+        },
+        {
+          "name": "WebToon",
+          "url": "https://m.webtoons.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "httpStatus": 200,
+          "finalUrl": "https://www.webtoons.com/en/"
+        },
+        {
+          "name": "奇漫屋",
+          "url": "http://qiman6.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        },
+        {
+          "name": "拷贝漫画",
+          "url": "https://copymanga.com/h5",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        },
+        {
+          "name": "最漫画",
+          "url": "https://m.zuimh.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        },
+        {
+          "name": "看漫画啦",
+          "url": "https://kanmanhuala.com",
+          "containsJs": true,
+          "readability": "未作完整链路验证",
+          "error": "UND_ERR_CONNECT_TIMEOUT"
+        }
+      ]
+    }
+  ]
+}

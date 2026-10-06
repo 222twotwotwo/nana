@@ -1,0 +1,25 @@
+{
+  "name": "moyin-reader",
+  "version": "3.0.0",
+  "private": true,
+  "description": "墨音：个人小说、漫画与情境伴读",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test test/*.test.js",
+    "check:sources": "node scripts/check-sources.js",
+    "audit:upstream": "node scripts/audit-upstream.js"
+  },
+  "dependencies": {
+    "acorn": "8.15.0",
+    "cheerio": "1.2.0",
+    "iconv-lite": "0.7.0",
+    "jsdom": "26.1.0",
+    "undici": "7.30.0"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "6.2.5"
+  }
+}

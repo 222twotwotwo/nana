@@ -1,0 +1,9 @@
+node_modules
+.research
+.server
+.workbuddy
+.git
+data
+test
+docs
+*.log

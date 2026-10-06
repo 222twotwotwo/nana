@@ -1,0 +1,303 @@
+[
+ {
+  "cat": "novel",
+  "name": "起点中文",
+  "url": "https://www.qidian.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "番茄小说2",
+  "url": "https://fqapi.komr.cn",
+  "reason": "需要浏览器交互验证",
+  "err": "searchUrl 为空（可能需要浏览器验证）"
+ },
+ {
+  "cat": "novel",
+  "name": "69书吧.com",
+  "url": "https://www.69shuba.com",
+  "reason": "需要浏览器交互验证",
+  "err": "searchUrl 为空（可能需要浏览器验证）"
+ },
+ {
+  "cat": "novel",
+  "name": "69书吧",
+  "url": "https://69shuba.cx",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "速读谷",
+  "url": "https://www.sudugu.co",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "novel",
+  "name": "得奇小说网",
+  "url": "https://www.deqixs.com",
+  "reason": "站点死亡（超时）",
+  "err": "The operation was aborted due to timeout"
+ },
+ {
+  "cat": "novel",
+  "name": "快书网",
+  "url": "https://www.kuaishu5.com",
+  "reason": "站点死亡（超时）",
+  "err": "The operation was aborted due to timeout"
+ },
+ {
+  "cat": "novel",
+  "name": "天天看小说",
+  "url": "https://cn.ttkan.co",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "独步小说网",
+  "url": "https://www.dbxsd.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "手机小说",
+  "url": "https://www.shoujix.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "铅笔小说",
+  "url": "https://www.23qb.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "来看文学",
+  "url": "https://m.laikan9.com",
+  "reason": "需要浏览器交互验证",
+  "err": "searchUrl 为空（可能需要浏览器验证）"
+ },
+ {
+  "cat": "novel",
+  "name": "大文学无错小说网",
+  "url": "https://www.wcxsw.org",
+  "reason": "需要浏览器交互验证",
+  "err": "searchUrl 为空（可能需要浏览器验证）"
+ },
+ {
+  "cat": "novel",
+  "name": "和图书",
+  "url": "https://hetushu.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "思路客",
+  "url": "https://www.siluke.com",
+  "reason": "需要浏览器交互验证",
+  "err": "searchUrl 为空（可能需要浏览器验证）"
+ },
+ {
+  "cat": "novel",
+  "name": "顶点小说 ddxs",
+  "url": "https://www.ddxs.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "novel",
+  "name": "艾途小说",
+  "url": "https://m.aitbooks.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "novel",
+  "name": "就爱文学",
+  "url": "http://www.92xs.info",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "novel",
+  "name": "八一中文",
+  "url": "https://www.81zw2.com",
+  "reason": "需要浏览器交互验证",
+  "err": "searchUrl 为空（可能需要浏览器验证）"
+ },
+ {
+  "cat": "novel",
+  "name": "武林中文网",
+  "url": "https://www.50zw.so",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "咪咕动漫",
+  "url": "http://m.migudm.cn",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "布卡漫画 ",
+  "url": "http://www.buka.cn",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "非麻瓜",
+  "url": "https://www.fmgmh.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "奇热漫画",
+  "url": "https://m.qiremanhua.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "6漫画",
+  "url": "http://www.6mh7.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "动漫之家₁-M",
+  "url": "https://m.dmzj1.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "动漫之家₂-M",
+  "url": "https://api.dmzj1.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "动漫之家v3₁",
+  "url": "http://v3api.dmzj.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "酷漫屋",
+  "url": "http://m.kuman55.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "漫画台🅰",
+  "url": "https://m.manhuatai.com/api",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "奇漫屋",
+  "url": "http://qiman6.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "神漫画",
+  "url": "https://m.taomanhua.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "6漫画",
+  "url": "http://www.sixmh6.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "拷贝漫画",
+  "url": "https://copymanga.com/h5",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "爱米推漫画",
+  "url": "https://m.imitui.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "鬼萝莉漫画",
+  "url": "http://www.gllmh.com",
+  "reason": "站点死亡（超时）",
+  "err": "The operation was aborted due to timeout"
+ },
+ {
+  "cat": "comic",
+  "name": "最漫画",
+  "url": "https://m.zuimh.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "WebToon",
+  "url": "https://m.webtoons.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "动漫之家",
+  "url": "https://m.dmzj.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "土豆漫画网",
+  "url": "https://m.xm124.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "147漫画网",
+  "url": "https://m.i2356.com",
+  "reason": "API 退化或解析为空（不可用）",
+  "err": "搜索结果解析为空"
+ },
+ {
+  "cat": "comic",
+  "name": "517漫画",
+  "url": "http://m.517mh.net",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ },
+ {
+  "cat": "comic",
+  "name": "看漫画啦",
+  "url": "https://kanmanhuala.com",
+  "reason": "站点死亡（连接失败）",
+  "err": "fetch failed"
+ }
+]

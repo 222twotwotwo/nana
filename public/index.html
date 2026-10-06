@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>墨音 · 阅读、音乐与番剧</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header id="chrome" class="hidden">
+  <div class="seg" id="mainSeg">
+    <button data-nav="home" class="on">主页</button>
+    <button data-nav="library">书库</button>
+    <button data-nav="search" aria-label="搜索" title="搜索"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  </div>
+  <div class="chrome-right">
+    <button id="btnViewMode" title="切换视图">☰</button>
+    <button id="btnMore" title="更多">⋯</button>
+  </div>
+</header>
+
+<main>
+  <!-- 主页 -->
+  <section id="page-home" class="page hidden">
+    <div class="page-inner" id="homeBox">
+      <div class="home-heading"><h1 class="big-title">主页</h1></div>
+      <div id="homeSearch" class="hidden">
+        <form id="storeBar">
+          <input type="text" id="storeKw" maxlength="100" aria-label="搜索内容" placeholder="搜索书名、作者或关键词">
+          <button class="btn primary" id="btnStoreSearch" type="submit">搜索</button>
+          <button class="btn" id="closeSearch" type="button">取消</button>
+        </form>
+        <div id="storeStatus" class="muted" role="status" aria-live="polite"></div>
+        <div id="storeErrors" class="muted" role="status"></div>
+        <div id="storeGrid" class="book-grid"></div>
+      </div>
+      <div id="homeOverview">
+        <div id="homeContinue"></div>
+        <div id="homeRecent"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-anime" class="page hidden"><div class="page-inner" id="animeBox"></div></section>
+
+  <!-- 书库 -->
+  <section id="page-library" class="page hidden">
+    <div class="page-inner">
+      <div class="home-heading"><h1 class="big-title">书库</h1>
+      <div class="category-tabs compact" id="libraryTypeSeg" aria-label="收藏分类">
+        <button data-ctype="novel">小说</button><button data-ctype="comic">漫画</button><button data-ctype="music">音乐</button><button data-ctype="anime">番剧</button>
+      </div></div>
+      <input type="file" id="fileImport" accept=".txt" multiple class="hidden">
+      <input type="file" id="fileMusic" accept="audio/*" multiple class="hidden">
+      <div id="libraryAmbience" class="row hidden"><span class="muted">合成氛围音：</span><button class="btn small" data-synth="rain">夜雨</button><button class="btn small" data-synth="wave">海浪</button><button class="btn small" data-synth="drone">低鸣</button></div>
+      <div class="book-grid" id="bookGrid"></div>
+    </div>
+  </section>
+
+  <!-- 阅读页 -->
+  <section id="page-reader" class="page hidden">
+    <div id="rdHead"><span id="rdHeadTitle"></span></div>
+    <div id="readerScroll">
+      <article id="chapterBody"></article>
+    </div>
+    <aside id="chDrawer"></aside>
+    <div id="rdFab">
+      <div id="rdMenu" class="hidden"></div>
+      <div id="fabBar"><span id="fabText">目录 · 0%</span><span class="fb-ico">☰</span></div>
+    </div>
+  </section>
+
+  <!-- 音乐页 -->
+  <section id="page-music" class="page hidden">
+    <div id="muBg"></div>
+    <div class="mu-inner">
+      <div class="mu-top">
+        <button id="muBack" title="返回收藏">⌄</button>
+        <div id="muTitle">音 乐</div>
+        <button id="muReplay" title="从头播放">↻</button>
+      </div>
+      <div class="mu-stage">
+        <div class="vinyl-box">
+          <div id="disc"><div id="muCover">♪</div></div>
+          <svg id="tonearm" viewBox="0 0 100 170">
+            <circle cx="24" cy="26" r="15" fill="#e9e9e9"/>
+            <circle cx="24" cy="26" r="6.5" fill="#9a9a9a"/>
+            <rect x="21" y="38" width="6" height="86" rx="3" fill="#f2f2f2"/>
+            <rect x="14" y="120" width="20" height="30" rx="6" fill="#e0e0e0" transform="rotate(16 24 128)"/>
+          </svg>
+        </div>
+        <div class="mu-lyric" id="muLyric">为阅读选一首配乐</div>
+      </div>
+      <div class="mu-panel">
+        <h2 id="muName">未在播放</h2>
+        <div class="mu-meta">
+          <span id="muEmo" class="badge">—</span>
+          <span id="muState" style="opacity:.65">从下方列表选择一首，或开启阅读伴读</span>
+        </div>
+        <div class="mu-prog">
+          <span id="muCur">0:00</span>
+          <input type="range" id="muSeek" aria-label="播放进度" min="0" max="1000" value="0">
+          <span id="muDur">0:00</span>
+        </div>
+        <div class="mu-note" id="muNote"></div>
+        <div class="mu-ctrl">
+          <button id="muShuffle" title="随机播放">🔀</button>
+          <button id="muPrev" title="上一首">⏮</button>
+          <button id="muPlay" title="播放/暂停">▶</button>
+          <button id="muNext" title="下一首">⏭</button>
+          <button id="muListBtn" title="查找音乐">☰</button>
+        </div>
+      </div>
+      <div class="mu-foot">
+        <button id="mfTheme" title="明暗主题">☾</button>
+        <button id="mfInfo" title="说明">ⓘ</button>
+        <button id="mfMore" title="更多">⋯</button>
+      </div>
+    </div>
+    <div id="muDrawer">
+      <div class="row"><h3 class="grow">播放列表 <span id="musicCount">0</span></h3><button class="btn small" id="muDrawerClose" title="回到播放器">↑</button></div>
+      <p class="muted">曲目标签可用于阅读时的情境配乐。</p>
+      <div class="row music-player-links"><button class="btn small" id="musicDiscover">发现音乐</button><button class="btn small" id="musicCollection">管理收藏</button></div>
+      <label class="fld" for="muVol">音量</label>
+      <input type="range" id="muVol" min="0" max="100" style="width:100%; margin-bottom:14px">
+      <div id="musicList"></div>
+    </div>
+  </section>
+
+  <!-- 情境配乐 -->
+  <section id="page-cine" class="page hidden"><div class="page-inner" id="cineBox"></div></section>
+
+  <!-- 设置 -->
+  <section id="page-settings" class="page hidden"><div class="page-inner" id="settingsBox"></div></section>
+</main>
+<div id="storeModal" class="hidden" role="dialog" aria-modal="true" aria-label="作品详情"></div>
+
+<div id="toast"></div>
+
+<script src="/backup.js" defer></script>
+<script src="/app.js" defer></script>
+<script src="/store.js" defer></script>
+<script src="/catalog.js" defer></script>
+<script src="/music.js" defer></script>
+<script src="/anime.js" defer></script>
+<script src="/settings.js" defer></script>
+</body>
+</html>

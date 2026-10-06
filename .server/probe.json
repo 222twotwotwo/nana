@@ -1,0 +1,98 @@
+{
+ "novel:0": {
+  "name": "酷我小说",
+  "url": "http://appi.kuwo.cn",
+  "ok": true,
+  "err": "",
+  "books": 24,
+  "first": "剑神重生",
+  "detailName": "剑神重生",
+  "chapters": 3193,
+  "textLen": 3090,
+  "ms": 1220
+ },
+ "酷我小说": {
+  "name": "酷我小说",
+  "url": "http://appi.kuwo.cn",
+  "ok": true,
+  "err": "",
+  "books": 24,
+  "first": "剑神重生",
+  "detailName": "剑神重生",
+  "chapters": 3193,
+  "textLen": 3090,
+  "ms": 1220
+ },
+ "novel:1": {
+  "name": "阅友小说",
+  "url": "http://m.suixkan.com",
+  "ok": true,
+  "err": "",
+  "books": 5,
+  "first": "剑帝",
+  "detailName": "剑帝",
+  "chapters": 6980,
+  "textLen": 3121,
+  "ms": 1616
+ },
+ "阅友小说": {
+  "name": "阅友小说",
+  "url": "http://m.suixkan.com",
+  "ok": true,
+  "err": "",
+  "books": 5,
+  "first": "剑帝",
+  "detailName": "剑帝",
+  "chapters": 6980,
+  "textLen": 3121,
+  "ms": 1616
+ },
+ "comic:0": {
+  "name": "漫画人",
+  "url": "http://www.manhuaren.com",
+  "ok": true,
+  "err": "",
+  "books": 22,
+  "first": "剑魂",
+  "detailName": "剑魂",
+  "chapters": 63,
+  "images": 31,
+  "ms": 1216
+ },
+ "漫画人": {
+  "name": "漫画人",
+  "url": "http://www.manhuaren.com",
+  "ok": true,
+  "err": "",
+  "books": 22,
+  "first": "剑魂",
+  "detailName": "剑魂",
+  "chapters": 63,
+  "images": 31,
+  "ms": 1216
+ },
+ "comic:1": {
+  "name": "极速漫画",
+  "url": "http://www.1kkk.com",
+  "ok": true,
+  "err": "",
+  "books": 22,
+  "first": "剑魂",
+  "detailName": "剑魂",
+  "chapters": 63,
+  "images": 31,
+  "ms": 1703
+ },
+ "极速漫画": {
+  "name": "极速漫画",
+  "url": "http://www.1kkk.com",
+  "ok": true,
+  "err": "",
+  "books": 22,
+  "first": "剑魂",
+  "detailName": "剑魂",
+  "chapters": 63,
+  "images": 31,
+  "ms": 1703
+ }
+}
