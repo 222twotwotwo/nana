@@ -49,6 +49,18 @@ test('KazumiRules 索引中的 16 个番剧源全部注册',()=>{
   assert.deepEqual(names,['7sefun','DM84','aafun','AGE','akianime','baimao','dalvdm','ezdmw','giriGiriLove','mgnacg','moonci','mutefun','MXdm','sorani','xfdmneo','xfdmnext']);
 });
 
+test('7sefun 详情去除热度，所有番剧搜索和取链使用直连优先的自动路由',async()=>{
+  const routes=[];
+  const s=source('kazumi-7sefun',{text:async(url,options)=>{
+    routes.push(options.route);
+    return '<div class="video-p-name">无职转生Ⅲ 到了异世界就拿出真本事<span class="seperate"></span>热度：88171°C</div><div class="vod-play-list-container"><a href="/vodplay/38261-1-1.html">第01集</a></div>';
+  }});
+  const d=await s.detail('https://www.7sefun.top/voddetail/38261.html');
+  assert.equal(d.name,'无职转生Ⅲ 到了异世界就拿出真本事');
+  assert.deepEqual(routes,['auto']);
+  assert.ok(createSources().filter(s=>s.type==='anime').every(s=>s.route==='auto'));
+});
+
 test('KazumiRules 允许已登记的搜索跳转域名',()=>{
   const baimao=source('kazumi-baimao'), xfdmneo=source('kazumi-xfdmneo');
   assert.ok(baimao.hosts.includes('www.bmmdmm.com'));

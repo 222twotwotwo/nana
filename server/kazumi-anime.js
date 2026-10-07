@@ -35,7 +35,7 @@ function template(value, vars) {
 }
 function hostOf(url) { try{return new URL(url).hostname;}catch{return null;} }
 function requestHosts(config) {
-  const urls=[config.baseURL,config.searchApiConfig?.request?.url,config.chapterApiConfig?.request?.url,config.chapterApiConfig?.episodePage?.url];
+  const urls=[config.baseURL,config.searchURL,config.searchApiConfig?.request?.url,config.chapterApiConfig?.request?.url,config.chapterApiConfig?.episodePage?.url];
   return [...new Set([...urls.map(hostOf),...(config.hostAliases||[])].filter(Boolean))];
 }
 function parseDocument(html) { return new JSDOM(String(html)).window.document; }
@@ -75,7 +75,7 @@ function xpathChapters(config, html) {
   return [...new Map(chapters.map(x=>[x.url,x])).values()];
 }
 async function apiRequest(io, request, vars, hosts) {
-  const url=replace(request.url,vars), options={hosts,route:'direct',method:request.method||'GET',headers:request.headers||{}};
+  const url=replace(request.url,vars), options={hosts,route:'auto',method:request.method||'GET',headers:request.headers||{}};
   if(options.method==='GET') {
     const u=new URL(url); for(const [k,v] of Object.entries(template(request.query||{},vars))) u.searchParams.set(k,String(v));
     return io.json(u.href,options);
@@ -100,26 +100,30 @@ function apiChapters(config, data, source) {
   }
   return [...new Map(out.map(x=>[x.url,x])).values()];
 }
+function mediaAllowed(url, mediaHosts) {
+  network.mediaAllowed(url, mediaHosts);
+}
 async function resolvePlay(io, url, hosts, mediaHosts, depth=0) {
   if(depth>3) throw new Error('番剧播放地址仍是中转页，请打开原站播放');
   network.allowedUrl(url,hosts);
-  const html=await io.text(url,{hosts,route:'direct'});
+  const html=await io.text(url,{hosts,route:'auto'});
   const direct=html.match(/https?:[^\s"'<>\\]+\.(?:mp4|m3u8)(?:\?[^\s"'<>\\]*)?/i)?.[0];
-  if(direct){network.allowedUrl(direct,mediaHosts);return {stream:direct,referer:url};}
-  try { const data=playerData(html), decoded=decodeUrl(data.url); network.allowedUrl(decoded,[...hosts,...mediaHosts]); if(/\.(?:mp4|m3u8)(?:$|[?#])/i.test(decoded)){network.allowedUrl(decoded,mediaHosts);return {stream:decoded,referer:url};} return resolvePlay(io,decoded,[...hosts,...mediaHosts],mediaHosts,depth+1); } catch {}
+  if(direct){mediaAllowed(direct,mediaHosts);return {stream:direct,referer:url};}
+  try { const data=playerData(html), decoded=decodeUrl(data.url); mediaAllowed(decoded,[...hosts,...mediaHosts]); if(/\.(?:mp4|m3u8)(?:$|[?#])/i.test(decoded)){mediaAllowed(decoded,mediaHosts);return {stream:decoded,referer:url};} return resolvePlay(io,decoded,[...hosts,...mediaHosts],mediaHosts,depth+1); } catch {}
   const iframe=parseDocument(html).querySelector('iframe[src]')?.getAttribute('src');
-  if(iframe) { const frame=absolute(iframe,url); try { const bootstrap=hhjxBootstrap(await io.text(frame,{hosts:[hostOf(frame)],route:'direct'})); const api=new URL('/api/parse',frame).href; const raw=await io.text(api,{hosts:[hostOf(frame)],route:'direct',method:'POST',headers:{Origin:`${new URL(frame).origin}`,Referer:frame,'Content-Type':'application/json'},body:JSON.stringify({url:bootstrap.url,t:bootstrap.t,key:bootstrap.key,client_fallback:false})}); const result=JSON.parse(raw); if(result.code===200&&result.url){network.allowedUrl(result.url,mediaHosts);return {stream:result.url,referer:url};} } catch {} return resolvePlay(io,frame,[...hosts,hostOf(frame)],mediaHosts,depth+1); }
+  if(iframe) { const frame=absolute(iframe,url); try { const bootstrap=hhjxBootstrap(await io.text(frame,{hosts:[hostOf(frame)],route:'auto'})); const api=new URL('/api/parse',frame).href; const raw=await io.text(api,{hosts:[hostOf(frame)],route:'auto',method:'POST',headers:{Origin:`${new URL(frame).origin}`,Referer:frame,'Content-Type':'application/json'},body:JSON.stringify({url:bootstrap.url,t:bootstrap.t,key:bootstrap.key,client_fallback:false})}); const result=JSON.parse(raw); if(result.code===200&&result.url){mediaAllowed(result.url,mediaHosts);return {stream:result.url,referer:url};} } catch {} return resolvePlay(io,frame,[...hosts,hostOf(frame)],mediaHosts,depth+1); }
   throw new Error('番剧播放页未提供公开地址');
 }
 function kazumiAnimeSources(io) {
-  return rules.filter(config=>!SKIP.has(config.name)).map(config=>{
+  return rules.filter(config=>!SKIP.has(config.name)).map(config=>createKazumiSource(io,config));
+}
+function createKazumiSource(io,config) {
     const base=new URL(config.baseURL).origin+'/', hosts=requestHosts(config), mediaHosts=[...new Set([...hosts,'.gtimg.com','.qq.com','.qpic.cn','.adkwai.com','.bilivideo.com','.m3u8.live'])];
-    const page=async url=>{network.allowedUrl(url,hosts);return io.text(url,{hosts,route:'direct'});};
-    return {id:`kazumi-${config.name.toLowerCase()}`,name:config.name,type:'anime',base,hosts,mediaHosts,route:'direct',repository:'https://github.com/Predidit/KazumiRules',note:`KazumiRules ${config.name} · 自动适配公开搜索、目录与播放地址`,
+    const page=async url=>{network.allowedUrl(url,hosts);return io.text(url,{hosts,route:'auto'});};
+    return {id:`kazumi-${config.name.toLowerCase()}`,name:config.name,type:'anime',base,hosts,mediaHosts,route:'auto',repository:'https://github.com/Predidit/KazumiRules',note:`KazumiRules ${config.name} · 自动适配公开搜索、目录与播放地址`,
       async search(keyword){if(config.searchMode==='api') return apiSearch(config,await apiRequest(io,config.searchApiConfig.request,{keyword},hosts));return xpathSearch(config,await page(replace(config.searchURL,{keyword})));},
       async detail(url){if(config.chapterMode==='api'){const source=url.split('/').pop(),data=await apiRequest(io,config.chapterApiConfig.request,{source},hosts),name=clean(String(pathValues(data,'$.data.title')[0]??pathValues(data,'$.title')[0]??config.name));return {name,chapters:apiChapters(config,data,source)};} const html=await page(url), chapters=xpathChapters(config,html); if(!chapters.length) throw new Error('番剧详情或目录为空'); return {name:clean(parseDocument(html).querySelector('title')?.textContent?.replace(/.*?[《]/,'').replace(/[》].*$/,'')||config.name),chapters};},
       async play(url){return resolvePlay(io,url,hosts,mediaHosts);}
     };
-  });
 }
-module.exports={kazumiAnimeSources,pathValues,xpathSearch,xpathChapters};
+module.exports={kazumiAnimeSources,createKazumiSource,pathValues,xpathSearch,xpathChapters};

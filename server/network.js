@@ -19,7 +19,7 @@ const directDispatcher = new Agent({
   connect: { lookup(host, options, callback) {
     dns.lookup(host, { ...options, all:true }, (err, addresses) => {
       if (err) return callback(err);
-      if (!addresses.length || addresses.some(a=>!publicAddress(a.address))) return callback(new Error('禁止访问内网地址'));
+      if (!addresses.length || addresses.some(a=>!publicAddress(a.address))) return callback(Object.assign(new Error('禁止访问内网地址'),{code:'ERR_PRIVATE_ADDRESS'}));
       callback(null, options.all ? addresses : addresses[0].address, addresses[0].family);
     });
   } }
@@ -42,35 +42,74 @@ function allowedUrl(value, hosts) {
   }
   return u;
 }
-async function open(value, { hosts, headers={}, timeout=20000, route='direct', method='GET', body, signal:externalSignal }={}) {
+// 番剧视频流 CDN 因源而异，白名单未覆盖时退回协议校验；
+// 内网/SSRF 防护仍由 directDispatcher 的公网 DNS 检查兜底。
+function mediaAllowed(value, hosts) {
+  try { return allowedUrl(value, hosts); }
+  catch {
+    let u;
+    try { u = new URL(value); } catch { throw new Error('无效媒体地址'); }
+    if (!['http:','https:'].includes(u.protocol) || u.username || u.password ||
+        (u.port && !['80','443'].includes(u.port))) throw new Error('无效媒体地址');
+    return u;
+  }
+}
+async function openRoute(value, { hosts, headers={}, timeout=20000, route='direct', method='GET', body, signal:externalSignal, streaming=false, publicOnly=false }={}) {
   let u = allowedUrl(value, hosts);
   const dispatcher=dispatcherFor(route);
-  const signal = externalSignal ? AbortSignal.any([externalSignal,AbortSignal.timeout(timeout)]) : AbortSignal.timeout(timeout);
+  const deadline=streaming?new AbortController():null;
+  const timer=deadline?setTimeout(()=>deadline.abort(),timeout):null;
+  timer?.unref();
+  const timeoutSignal=deadline?.signal||AbortSignal.timeout(timeout);
+  const signal = externalSignal ? AbortSignal.any([externalSignal,timeoutSignal]) : timeoutSignal;
+  try {
   for (let n=0; n<5; n++) {
+    if(publicOnly) {
+      const host=u.hostname.replace(/^\[|\]$/g,'');
+      const addresses=net.isIP(host)?[{address:host}]:await dns.promises.lookup(host,{all:true});
+      if(!addresses.length||addresses.some(x=>!publicAddress(x.address))) throw new Error('禁止访问内网来源地址');
+    }
     let res;
     try { res = await fetch(u, { dispatcher, signal, method, body, redirect:'manual', headers:{ 'User-Agent':UA, ...headers } }); }
-    catch(e) { throw new Error(signal.aborted ? '源站请求超时，请稍后重试' : `源站连接失败：${e.cause?.code || e.message}`); }
+    catch(e) { throw Object.assign(new Error(signal.aborted ? '源站请求超时，请稍后重试' : `源站连接失败：${e.cause?.code || e.message}`),{retryable:!externalSignal?.aborted&&e.cause?.code!=='ERR_PRIVATE_ADDRESS'}); }
     if ([301,302,303,307,308].includes(res.status)) {
       await res.body?.cancel();
       u = allowedUrl(new URL(res.headers.get('location'), u).href, hosts);
       if(res.status===303 || ([301,302].includes(res.status)&&method==='POST')) { method='GET'; body=undefined; }
       continue;
     }
-    if (!res.ok) { await res.body?.cancel(); throw Object.assign(new Error(`源站 HTTP ${res.status}`),res.status===416?{status:416}:{}); }
+    if (!res.ok) { await res.body?.cancel(); throw Object.assign(new Error(`源站 HTTP ${res.status}`),{retryable:![401,416].includes(res.status)},res.status===416?{status:416}:{}); }
     return {response:res,url:u.href};
   }
   throw new Error('源站重定向过多');
+  } finally { if(timer) clearTimeout(timer); }
 }
-async function request(value, options={}) {
-  const {response:res,url}=await open(value,options),maxBytes=options.maxBytes??5*1024*1024;
+async function withRouteFallback(run,options) {
+  if(options.route!=='auto') return run(options);
+  try { return await run({...options,route:'direct'}); }
+  catch(directError) {
+    if(!directError.retryable || !proxyDispatcher || options.signal?.aborted) throw directError;
+    try { return await run({...options,route:'proxy'}); }
+    catch(proxyError) { throw Object.assign(new Error(`直连失败（${directError.message}）；代理重试失败（${proxyError.message}）`),{status:proxyError.status}); }
+  }
+}
+function open(value,options={}) { return withRouteFallback(opts=>openRoute(value,opts),options); }
+async function requestRoute(value, options) {
+  const {response:res,url}=await openRoute(value,options),maxBytes=options.maxBytes??5*1024*1024;
   const parts=[]; let size=0;
-  for await (const part of res.body) {
-    size+=part.length;
-    if (size>maxBytes) throw new Error('源站响应超过大小限制');
-    parts.push(part);
+  try {
+    for await (const part of res.body) {
+      size+=part.length;
+      if (size>maxBytes) throw Object.assign(new Error('源站响应超过大小限制'),{retryable:false});
+      parts.push(part);
+    }
+  } catch(e) {
+    if(e.retryable===undefined) e.retryable=!options.signal?.aborted;
+    throw e;
   }
   return {bytes:Buffer.concat(parts),type:res.headers.get('content-type')||'',url};
 }
+function request(value,options={}) { return withRouteFallback(opts=>requestRoute(value,opts),options); }
 async function text(url, options) {
   const r = await request(url, options);
   const charset = r.type.match(/charset=([\w-]+)/i)?.[1] || 'utf8';
@@ -80,4 +119,4 @@ async function json(url, options) {
   const raw = await text(url, options);
   try { return JSON.parse(raw); } catch { throw new Error('源站未返回 JSON，可能需要验证或接口已变更'); }
 }
-module.exports = { open, request, text, json, allowedUrl, publicAddress, dispatcherFor };
+module.exports = { open, request, text, json, allowedUrl, mediaAllowed, publicAddress, dispatcherFor };

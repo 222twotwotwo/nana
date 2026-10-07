@@ -5,16 +5,23 @@ const {createHash}=require('node:crypto');
 const {createSources}=require('./sources');
 const network=require('./network');
 const {openAudio}=require('./audio');
+const {MAX_SOURCES,parseCustomRules,customSourceId,customAnimeSource}=require('./custom-sources');
 
 const DAY=86400000;
 class ReaderService {
   constructor({sources=createSources(),dataDir=path.join(__dirname,'../data'),io=network}={}) {
     this.sources=sources; this.dataDir=dataDir; this.io=io;
     this.pending=new Map(); this.health={}; this.active=new Map();
+    this.customRules=[];
   }
   async init() {
     await fs.mkdir(path.join(this.dataDir,'cache'),{recursive:true});
     try { this.health=JSON.parse(await fs.readFile(path.join(this.dataDir,'health.json'),'utf8')); } catch {}
+    try {
+      const saved=JSON.parse(await fs.readFile(path.join(this.dataDir,'custom-sources.json'),'utf8'));
+      this.customRules=Array.isArray(saved)&&!saved.length?[]:parseCustomRules(saved);
+      this.sources=[...this.sources.filter(s=>!s.custom),...this.customRules.map(rule=>customAnimeSource(this.io,rule))];
+    } catch(e) { if(e.code!=='ENOENT') throw new Error(`自定义源文件读取失败：${e.message}`); }
     await this.pruneCache();
   }
   async pruneCache() {
@@ -33,15 +40,54 @@ class ReaderService {
   source(id) {
     const aliases={'srv:novel:0':'kuwo','srv:novel:1':'yueyou','srv:comic:0':'manhuaren','srv:comic:1':'dm5','7sefun':'kazumi-7sefun','dm84':'kazumi-dm84'};
     const requested=String(id||''), target=aliases[requested] || requested;
-    const s=this.sources.find(s=>s.id===target || s.id===`kazumi-${requested.toLowerCase()}` || s.name.toLowerCase()===requested.toLowerCase());
+    const lower=requested.toLowerCase();
+    const s=this.sources.find(s=>s.id===target
+      || s.id===lower
+      || s.id===`kazumi-${lower.replace(/^kazumi-/,'')}`
+      || s.name.toLowerCase()===lower.replace(/^kazumi-/,''));
     if(!s) throw Object.assign(new Error('该书源未接入，请在书城选择当前可用来源'),{status:404});
     return s;
   }
   list() {
-    return this.sources.map(({id,name,type,base,repository,note,route='direct'})=>{
-      const check=this.health[id] || null;
-      return {id,name,type,base,repository,note,route,health:check,
+    return this.sources.map(({id,name,type,base,repository,note,custom,revision,route='direct'})=>{
+      const check=custom&&this.health[id]?.revision!==revision?null:this.health[id] || null;
+      return {id,name,type,base,repository,note,route,custom:!!custom,health:check,
         status:!check?'unchecked':Date.now()-Date.parse(check.checkedAt)>DAY?'stale':check.ok?'healthy':'failed'};
+    });
+  }
+  updateCustomSources(change) {
+    const work=(this.customWrite||Promise.resolve()).catch(()=>{}).then(async()=>{
+      const {rules,result}=change(this.customRules);
+      if(rules.length>MAX_SOURCES) throw Object.assign(new Error('最多保留 100 个自定义源，请先移除不需要的源'),{status:400});
+      const sources=rules.map(rule=>customAnimeSource(this.io,rule));
+      const file=path.join(this.dataDir,'custom-sources.json');
+      await fs.writeFile(file+'.tmp',JSON.stringify(rules,null,2));
+      await fs.rename(file+'.tmp',file);
+      this.customRules=rules;
+      this.sources=[...this.sources.filter(s=>!s.custom),...sources];
+      return result;
+    });
+    this.customWrite=work;
+    return work;
+  }
+  importSources(input) {
+    const imported=parseCustomRules(input);
+    return this.updateCustomSources(current=>{
+      const merged=new Map(current.map(rule=>[customSourceId(rule),rule]));
+      let added=0,updated=0;
+      for(const rule of imported) {
+        const id=customSourceId(rule);
+        if(merged.has(id)) updated++;else added++;
+        merged.set(id,rule);
+      }
+      return {rules:[...merged.values()],result:{added,updated}};
+    });
+  }
+  removeSource(id) {
+    return this.updateCustomSources(current=>{
+      const rules=current.filter(rule=>customSourceId(rule)!==id);
+      if(rules.length===current.length) throw Object.assign(new Error('只能移除已导入的自定义源'),{status:404});
+      return {rules,result:{removed:id}};
     });
   }
   async cached(key,ttl,loader) {
@@ -71,11 +117,14 @@ class ReaderService {
         if(action==='detail' && (!d.name || !d.chapters?.length)) throw new Error('源站详情或目录为空');
         if(action==='content' && (s.type==='novel' ? !d.text || d.text.length<80 : !d.images?.length)) throw new Error('源站没有可读内容');
         if(action==='play' && (!['anime','music'].includes(s.type) || !d.stream)) throw new Error('源站没有可播放地址');
-        if(action==='play') network.allowedUrl(d.stream,s.audioHosts||s.mediaHosts);
+        if(action==='play') {
+          if(s.type==='anime') network.mediaAllowed(d.stream, s.audioHosts||s.mediaHosts);
+          else network.allowedUrl(d.stream, s.audioHosts||s.mediaHosts);
+        }
         return d;
       } finally { this.active.set(s.id,this.active.get(s.id)-1); }
     };
-    const cacheVersion=s.type==='music'?'v4':s.type==='anime'?'v4':'v3';
+    const cacheVersion=s.custom?s.revision:s.type==='music'?'v4':s.type==='anime'?'v5':'v3';
     return fresh?run():this.cached(`${s.id}:${cacheVersion}:${action}:${value}`,action==='search'?300000:action==='detail'?3600000:action==='play'?300000:s.type==='comic'?300000:30*DAY,run);
   }
   async audio(id,url,options) {
@@ -87,7 +136,7 @@ class ReaderService {
   async image(id,url,referer) {
     const s=this.source(id);
     const headers={Referer:referer?network.allowedUrl(referer,s.hosts).href:s.base+'/'};
-    const r=await this.io.request(url,{hosts:s.mediaHosts,headers,maxBytes:12*1024*1024,route:s.imageRoute||s.route||'direct'});
+    const r=await this.io.request(url,{hosts:s.mediaHosts,headers,maxBytes:12*1024*1024,route:s.imageRoute||s.route||'direct',publicOnly:!!s.custom});
     const b=r.bytes;
     const type=b[0]===255&&b[1]===216?'image/jpeg':b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))?'image/png':b.subarray(0,3).toString()==='GIF'?'image/gif':b.subarray(0,4).toString()==='RIFF'&&b.subarray(8,12).toString()==='WEBP'?'image/webp':null;
     if(!type) throw new Error('源站返回的不是有效图片');
@@ -98,6 +147,7 @@ class ReaderService {
     if(this.pending.has(key)) return this.pending.get(key);
     const promise=(async()=>{
       const t=Date.now(), out={checkedAt:new Date().toISOString(),ok:false,stage:'search',keyword:s.probe?.keyword||'剑',route:s.route||'direct'};
+      if(s.custom) out.revision=s.revision;
       try {
         const items=await this.action(id,'search',out.keyword,{fresh:true});
         out.books=items.length; if(!items.length) throw new Error('样本关键词无搜索结果');

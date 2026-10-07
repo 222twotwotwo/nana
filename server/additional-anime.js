@@ -62,9 +62,9 @@ function additionalDmbus(io) {
   const hosts=['dmbus.cc','www.dmbus.cc'];
   const playerHosts=['hhjx.hhplayer.com'];
   const mediaHosts=['.gtimg.com','.qq.com','.qpic.cn','.dmbus.cc','.hhplayer.com','.dytt-tvs.com'];
-  const page=async url=>{ network.allowedUrl(url,hosts); return io.text(url,{hosts,route:'direct'}); };
+  const page=async url=>{ network.allowedUrl(url,hosts); return io.text(url,{hosts,route:'auto'}); };
   return {
-    id:'kazumi-dm84',name:'DM84',type:'anime',base,hosts,mediaHosts,route:'direct',
+    id:'kazumi-dm84',name:'DM84',type:'anime',base,hosts,mediaHosts,route:'auto',
     repository:'https://github.com/Predidit/Kazumi',
     note:'Kazumi 番剧源 · 动漫巴士公开搜索、目录与播放地址',
     probe:{keyword:'火影',book:'^火影忍者$',chapter:'^1$'},
@@ -78,12 +78,12 @@ function additionalDmbus(io) {
       if(!iframe) throw new Error('动漫巴士播放页未提供播放器');
       const playerUrl=absolute(iframe,episodeUrl);
       network.allowedUrl(playerUrl,playerHosts);
-      const playerHtml=await io.text(playerUrl,{hosts:playerHosts,route:'direct'});
+      const playerHtml=await io.text(playerUrl,{hosts:playerHosts,route:'auto'});
       const bootstrap=hhjxBootstrap(playerHtml);
       const apiUrl=new URL('/api/parse',playerUrl).href;
       const payload={url:bootstrap.url,t:bootstrap.t,key:bootstrap.key,client_fallback:false};
       if(bootstrap.act===99) payload.act=99;
-      const raw=await io.text(apiUrl,{hosts:playerHosts,route:'direct',method:'POST',headers:{Origin:'https://hhjx.hhplayer.com',Referer:playerUrl,'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const raw=await io.text(apiUrl,{hosts:playerHosts,route:'auto',method:'POST',headers:{Origin:'https://hhjx.hhplayer.com',Referer:playerUrl,'Content-Type':'application/json'},body:JSON.stringify(payload)});
       let result; try { result=JSON.parse(raw); } catch { throw new Error('番剧解析接口返回无效'); }
       if(result.code!==200 || typeof result.url!=='string' || !result.url) throw new Error(result.msg||'番剧播放地址解析失败');
       network.allowedUrl(result.url,mediaHosts);
@@ -96,9 +96,9 @@ function additionalAnime(io) {
   const base='https://www.7sefun.top';
   const hosts=['www.7sefun.top','www.lmm85.com','www.lm85.com'];
   const mediaHosts=['.adkwai.com','.qpic.cn','.lmm85.com','.lm85.com','.dytt-tupian.com'];
-  const page=async url=>{ network.allowedUrl(url,hosts); return io.text(url,{hosts,route:'direct'}); };
+  const page=async url=>{ network.allowedUrl(url,hosts); return io.text(url,{hosts,route:'auto'}); };
   return [{
-    id:'kazumi-7sefun',name:'7sefun',type:'anime',base,hosts,mediaHosts,route:'direct',
+    id:'kazumi-7sefun',name:'7sefun',type:'anime',base,hosts,mediaHosts,route:'auto',
     repository:'https://github.com/Predidit/Kazumi',
     note:'Kazumi 番剧源 · 公开搜索、目录与播放地址',
     probe:{keyword:'火影',book:'^火影忍者$',chapter:'^第0'},
@@ -117,7 +117,7 @@ function additionalAnime(io) {
     },
     async detail(url) {
       const $=load(await page(url));
-      const name=clean($('.video-p-name').first().contents().filter((i,n)=>n.type==='text').text()||$('title').text().replace(/简介.*$/,''));
+      const name=clean(($('.video-p-name').first().contents().filter((i,n)=>n.type==='text').text()||$('title').text().replace(/简介.*$/,'')).replace(/热度\s*[:：].*$/,''));
       const cover=$('.video-author img,.video-detail img').first().attr('src');
       const intro=plain($('.video-p-subtitle').first().html()||'');
       const chapters=$('.vod-play-list-container a[href*="/vodplay/"]').map((i,e)=>({title:clean($(e).text()||$(e).attr('title')),url:absolute($(e).attr('href'),base)})).get();
