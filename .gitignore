@@ -1,6 +1,30 @@
+# 依赖
 node_modules/
-data/cache/
-data/custom-sources.json*
-.research/
-*.log
+
+# 构建产物
+dist/
+
+# 环境变量与密钥
 .env
+
+# 运行生成物与缓存（检测结果、服务端缓存、日志）
+data/
+*.log
+
+# 用户自定义来源配置
+data/custom-sources.json*
+
+# WorkBuddy 会话与项目工作数据
+.workbuddy/
+
+# 第三方仓库研究快照
+.research/
+
+# 系统与编辑器文件
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.local
+*.tsbuildinfo
