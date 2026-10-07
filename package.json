@@ -1,8 +1,8 @@
 {
-  "name": "moyin-reader",
+  "name": "nana",
   "version": "3.0.0",
   "private": true,
-  "description": "墨音：个人小说、漫画与情境伴读",
+  "description": "nana：个人小说、漫画与情境伴读",
   "engines": {
     "node": ">=22"
   },

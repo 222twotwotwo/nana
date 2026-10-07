@@ -168,7 +168,7 @@ function onNodeChange(i: number) {
     <div class="page-inner" id="cineBox">
       <template v-if="!books.length">
         <h1 class="big-title">情境配乐</h1>
-        <p class="muted">书库为空，请先导入小说（漫画暂不支持情绪分析）</p>
+        <p class="muted">库墙为空，请先导入小说（漫画暂不支持情绪分析）</p>
       </template>
       <template v-else>
         <h1 class="big-title">情境配乐</h1>

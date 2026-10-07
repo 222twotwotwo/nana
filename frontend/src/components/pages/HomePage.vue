@@ -77,14 +77,19 @@ function onCine() {
 <template>
   <section id="page-home" class="page">
     <div class="page-inner" id="homeBox">
-      <div class="home-heading"><h1 class="big-title">主页</h1></div>
+      <div class="home-heading">
+        <h1 class="big-title">{{ search.discover ? '搜索' : '主页' }}</h1>
+        <div v-if="search.discover" class="category-tabs compact" id="storeTypeSeg" role="tablist" aria-label="搜索分类">
+          <button v-for="(m, t) in CONTENT_TYPES" :key="t" type="button" :class="{ on: search.type === t }"
+            :aria-pressed="search.type === t ? 'true' : 'false'" @click="search.switchType(t as ContentType)">{{ m.label }}</button>
+        </div>
+      </div>
 
       <div id="homeSearch" :class="{ hidden: !search.discover }">
         <form id="storeBar" @submit.prevent="search.doStoreSearch()">
           <input ref="kwInput" type="text" id="storeKw" v-model="search.kw" maxlength="100" aria-label="搜索内容"
             :placeholder="meta.placeholder">
           <button class="btn primary" id="btnStoreSearch" type="submit" :disabled="search.loading">搜索</button>
-          <button class="btn" id="closeSearch" type="button" @click="search.closeSearch()">取消</button>
         </form>
         <div id="storeStatus" class="muted" role="status" aria-live="polite">{{ statusText }}</div>
         <div id="storeErrors" class="muted" role="status">{{ search.error }}</div>

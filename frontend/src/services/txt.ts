@@ -1,4 +1,4 @@
-import { dbAll, dbPut } from './idb'
+import { dbPut } from './idb'
 import { uid } from '../utils'
 import { useAppStore } from '../stores/app'
 import { useLibStore } from '../stores/lib'
@@ -49,15 +49,4 @@ export async function importTxtFile(file: File) {
   await dbPut('books', book)
   useAppStore().toast(`已导入《${book.title}》共 ${chapters.length} 章`)
   useLibStore().bump()
-}
-
-export async function ensureSampleBook() {
-  const books = await dbAll('books')
-  if (books.length) return
-  const { SAMPLE_BOOK } = await import('../constants')
-  await dbPut('books', {
-    id: 'sample', title: SAMPLE_BOOK.title, addedAt: Date.now(),
-    charCount: SAMPLE_BOOK.chapters.reduce((n, c) => n + c.text!.length, 0),
-    chapters: SAMPLE_BOOK.chapters
-  })
 }

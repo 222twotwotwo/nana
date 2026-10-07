@@ -253,24 +253,43 @@ watch(() => app.page, p => { if (p === 'anime') start() })
 onBeforeUnmount(cleanup)
 
 function back() { search.openCategory('anime', 'library') }
+
+const epTitle = computed(() => {
+  const book = animeState.book
+  if (!book) return ''
+  if (view.value.mode === 'ready' && view.value.chapterTitle) return view.value.chapterTitle
+  const idx = animeState.episode
+  return book.chapters[idx]?.title || `第 ${idx + 1} 集`
+})
+const epSub = computed(() => {
+  const book = animeState.book
+  if (!book) return ''
+  const total = book.chapters.length
+  return `《${book.title}》 · ${book.sourceName || '番剧'} · ${animeState.episode + 1}/${total} 集`
+})
 </script>
 
 <template>
   <section id="page-anime" class="page">
+    <button class="float-back" title="返回库墙" aria-label="返回库墙" @click="back">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
     <div class="page-inner" id="animeBox" v-if="animeState.book">
-      <div class="section-heading">
-        <h1 class="big-title">{{ animeState.book.title }}</h1>
-        <button class="btn small" id="animeBack" @click="back">返回收藏</button>
+      <div class="anime-head">
+        <span><b>{{ animeState.book.title }}</b> {{ epTitle }}</span>
       </div>
-      <p class="muted">{{ animeState.book.sourceName || '番剧' }} · {{ animeState.book.chapters.length }} 集</p>
-      <div class="anime-source-picker">
-        <label for="animeSource">播放来源</label>
-        <select id="animeSource" class="sel" :value="manualSource" @change="selectSource(($event.target as HTMLSelectElement).value)">
-          <option value="">自动换源</option>
-          <option v-for="source in sourceOptions" :key="source.id" :value="source.id">{{ source.name }}{{ source.custom ? '（自定义）' : '' }}</option>
-        </select>
+      <h1 class="anime-title">{{ epTitle }}</h1>
+      <p class="anime-epsub muted">{{ epSub }}</p>
+      <div class="anime-sub">
+        <div class="anime-source-picker">
+          <label for="animeSource">播放来源</label>
+          <select id="animeSource" class="sel" :value="manualSource" @change="selectSource(($event.target as HTMLSelectElement).value)">
+            <option value="">自动换源</option>
+            <option v-for="source in sourceOptions" :key="source.id" :value="source.id">{{ source.name }}{{ source.custom ? '（自定义）' : '' }}</option>
+          </select>
+        </div>
+        <p class="muted">{{ manualSource ? '手动选源：失败时保留你的选择，可随时切回自动换源。' : '自动换源：当前来源不可用时，自动尝试其他来源。' }}</p>
       </div>
-      <p class="muted">{{ manualSource ? '手动选源：失败时保留你的选择，可随时切回自动换源。' : '自动换源：当前来源不可用时，自动尝试其他来源。' }}</p>
       <div id="animePlayer" ref="playerBox">
         <template v-if="view.mode === 'loading'">
           <p class="store-empty">
@@ -308,7 +327,7 @@ function back() { search.openCategory('anime', 'library') }
 </template>
 
 <style scoped>
-.anime-source-picker { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.anime-source-picker { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .anime-source-picker label { flex: none; }
 .anime-source-picker select { flex: 1; min-width: 0; max-width: 320px; }
 </style>

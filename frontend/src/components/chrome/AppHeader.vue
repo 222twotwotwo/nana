@@ -55,7 +55,7 @@ const moreBtn = ref<HTMLElement | null>(null)
   <header id="chrome">
     <div class="seg" id="mainSeg" @click="onNav">
       <button data-nav="home" :class="{ on: navOn('home') }">主页</button>
-      <button data-nav="library" :class="{ on: navOn('library') }">书库</button>
+      <button data-nav="library" :class="{ on: navOn('library') }">库墙</button>
       <button data-nav="search" :class="{ on: navOn('search') }" aria-label="搜索" title="搜索">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" /></svg>
       </button>

@@ -12,10 +12,12 @@ import AnimePage from './components/pages/AnimePage.vue'
 import StoreModal from './components/store/StoreModal.vue'
 import AppToast from './components/common/AppToast.vue'
 import PopMenu from './components/common/PopMenu.vue'
+import AppConfirm from './components/common/AppConfirm.vue'
 import { importTxtFile } from './services/txt'
 
 const app = useAppStore()
-const CHROME_PAGES = ['home', 'library', 'anime', 'music', 'cine', 'settings']
+// 音乐/番剧/阅读为沉浸式页面：不显示顶部导航，由左上角悬浮返回键承担导航
+const CHROME_PAGES = ['home', 'library', 'cine', 'settings']
 const chromeVisible = computed(() => CHROME_PAGES.includes(app.page))
 
 onMounted(() => {
@@ -44,4 +46,5 @@ onMounted(() => {
   <StoreModal />
   <AppToast />
   <PopMenu />
+  <AppConfirm />
 </template>

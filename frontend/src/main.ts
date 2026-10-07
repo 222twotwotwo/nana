@@ -4,7 +4,6 @@ import { watchEffect } from 'vue'
 import App from './App.vue'
 import './styles/style.css'
 import { settings } from './services/settings'
-import { ensureSampleBook } from './services/txt'
 import { initServer } from './services/server'
 import { startMediaProgressTicker } from './services/music'
 import { useAppStore } from './stores/app'
@@ -20,15 +19,16 @@ async function boot() {
 
   app.mount('#app')
 
-  // 原版启动序列：示例书 → 主页 → 连接来源 → SW
+  // 启动序列：主页先渲染；书库为空时后台从在线来源拉取默认内容
   const appStore = useAppStore()
   const { useLibStore } = await import('./stores/lib')
-  await ensureSampleBook()
+  const { ensureSeedLibrary } = await import('./services/seed')
+  await ensureSeedLibrary()
   appStore.showPage('home')
   useLibStore().bump() // 驱动首页重新加载（此时页面可能已是 home）
   initServer()
   startMediaProgressTicker()
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {})
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {})
 }
 
 boot()

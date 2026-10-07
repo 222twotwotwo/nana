@@ -6,6 +6,7 @@ import { SOURCES, initServer, api } from '../../services/server'
 import { player } from '../../services/audio'
 import { deleteDatabase } from '../../services/idb'
 import { MoyinBackup } from '../../services/backup'
+import { confirmDialog } from '../../services/confirm'
 import SourceImport from '../settings/SourceImport.vue'
 
 const app = useAppStore()
@@ -67,7 +68,7 @@ async function onBackupFile(e: Event) {
   const input = e.target as HTMLInputElement
   try {
     const data = await MoyinBackup.read(input.files![0])
-    if (!confirm(`恢复 ${data.stores.books.length} 本书、${data.stores.music.length} 首音乐？同编号记录将被替换，其余记录保留。`)) return
+    if (!await confirmDialog({ title: '恢复备份', message: `恢复 ${data.stores.books.length} 本书、${data.stores.music.length} 首音乐？同编号记录将被替换，其余记录保留。`, okText: '恢复' })) return
     await MoyinBackup.restore(data)
     app.toast('恢复完成')
   } catch (err: any) {
@@ -77,7 +78,7 @@ async function onBackupFile(e: Event) {
 }
 
 async function onWipe() {
-  if (!confirm('将删除所有书籍、音乐、情境分析与设置，且不可恢复。确定继续？')) return
+  if (!await confirmDialog({ title: '清空全部数据', message: '将删除所有书籍、音乐、情境分析与设置，且不可恢复。确定继续？', okText: '全部删除', danger: true })) return
   if (player.ctx) player.fadeStop()
   await deleteDatabase()
   localStorage.removeItem('nr-settings')

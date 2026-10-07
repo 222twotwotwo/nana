@@ -2,6 +2,7 @@ import { dbAll, dbDel, dbGet, dbPut } from './idb'
 import { clearProgress, getProgress, saveMapping, getMapping } from './settings'
 import { SOURCES, sourceId } from './server'
 import { player } from './audio'
+import { confirmDialog } from './confirm'
 import { CONTENT_TYPES } from '../constants'
 import { fmtTime, uid, clamp } from '../utils'
 import type { BookRecord, MusicRecord, StoreItem, ContentType } from '../types'
@@ -70,7 +71,12 @@ export async function saveCatalogItem(src: any, item: StoreItem, det: any) {
 
 /** 移除收藏；返回是否已移除。UI 刷新由 lib revision 驱动。 */
 export async function removeCollection(record: any, type: ContentType) {
-  if (!confirm(`将「${record.title || record.name}」移出收藏？${type === 'novel' ? '已缓存正文和情境分析也将删除。' : ''}`)) return false
+  const ok = await confirmDialog({
+    title: '移出收藏',
+    message: `将「${record.title || record.name}」移出收藏？${type === 'novel' ? '已缓存正文和情境分析也将删除。' : ''}`,
+    okText: '移出', danger: true
+  })
+  if (!ok) return false
   await dbDel(type === 'music' ? 'music' : 'books', record.id)
   if (type === 'music') {
     if (player.currentMusic?.id === record.id) player.fadeStop()

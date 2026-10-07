@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { api, SOURCES } from '../../services/server'
+import { confirmDialog } from '../../services/confirm'
 import type { SourceMeta } from '../../types'
 
 const sourceFile = ref<HTMLInputElement | null>(null)
@@ -38,7 +39,9 @@ async function onFile(e: Event) {
 }
 
 async function removeSource(source: SourceMeta) {
-  if (busy.value || !confirm(`移除「${source.name}」？收藏和进度会保留；重新导入同名、同站点的规则可恢复使用。`)) return
+  if (busy.value) return
+  const ok = await confirmDialog({ title: '移除来源', message: `移除「${source.name}」？收藏和进度会保留；重新导入同名、同站点的规则可恢复使用。`, okText: '移除', danger: true })
+  if (!ok) return
   busy.value = true
   error.value = false
   try {

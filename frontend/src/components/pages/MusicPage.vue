@@ -28,13 +28,9 @@ const m = computed(() => player.currentMusic || musicState.muSelected)
 const playing = computed(() => { tick.value; return player.isPlaying() })
 const emo = computed(() => reader.ambOn && reader.playingEmotion ? reader.playingEmotion : (m.value?.tags?.[0] || ''))
 
-const hueBg = (music: any) => {
-  const h = hashHue(music ? music.name : 'mooin')
-  return `linear-gradient(168deg, hsl(${h},26%,44%) 0%, hsl(${h},30%,32%) 55%, hsl(${h},34%,16%) 100%)`
-}
-const bgStyle = computed(() => ({ background: hueBg(m.value) }))
+const hue = computed(() => hashHue(m.value ? m.value.name : 'nana'))
 const title = computed(() => reader.playingEmotion && reader.ambOn ? `情境 · ${reader.playingEmotion}` : '音 乐')
-const coverText = computed(() => m.value ? `${m.value.name.slice(0, 4)}<small>MOOIN</small>` : '♪')
+const coverText = computed(() => m.value ? `${m.value.name.slice(0, 4)}<small>NANA</small>` : '♪')
 const emoText = computed(() => {
   if (!m.value) return '—'
   return m.value.preview ? '试听片段' : emo.value || m.value.sourceName || '本地配乐'
@@ -142,11 +138,14 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
 </script>
 
 <template>
-  <section id="page-music" class="page">
-    <div id="muBg" :style="bgStyle" />
+  <section id="page-music" class="page" :style="{ '--mu-hue': String(hue) }">
+    <button class="float-back" title="返回库墙" aria-label="返回库墙" @click="search.openCategory('music', 'library')">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
+    <div id="muBg" />
     <div class="mu-inner">
       <div class="mu-top">
-        <button id="muBack" title="返回收藏" @click="search.openCategory('music', 'library')">⌄</button>
+        <span class="mu-spacer" />
         <div id="muTitle">{{ title }}</div>
         <button id="muReplay" title="从头播放" @click="onReplay">↻</button>
       </div>
@@ -154,7 +153,7 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
         <div class="vinyl-box">
           <div id="disc" :class="{ spin: !!player.currentMusic, paused: !playing }">
             <div id="muCover">
-              <template v-if="m">{{ m.name.slice(0, 4) }}<small>MOOIN</small></template>
+              <template v-if="m">{{ m.name.slice(0, 4) }}<small>NANA</small></template>
               <template v-else>♪</template>
             </div>
           </div>
@@ -208,7 +207,7 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
       <input type="range" id="muVol" min="0" max="100" style="width:100%; margin-bottom:14px"
         :value="Math.round(settings.volume * 100)" @input="player.setVolume(Number(($event.target as HTMLInputElement).value) / 100)">
       <div id="musicList">
-        <p v-if="!musics.length" class="music-empty muted">还没有曲目。到「发现音乐」搜索并添加，或上传本地文件、合成氛围音。</p>
+        <p v-if="!musics.length" class="music-empty muted">还没有曲目。到「发现音乐」搜索并添加，或上传本地音频文件。</p>
         <div v-for="row in musics" :key="row.id" class="music-row">
           <button class="m-play" :class="{ cur: player.currentMusic && player.currentMusic.id === row.id }"
             @click="onRowPlay(row)">{{ player.currentMusic && player.currentMusic.id === row.id && playing ? '⏸' : '▶' }}</button>

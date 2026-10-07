@@ -80,6 +80,14 @@ export const useSearchStore = defineStore('search', {
       this.discover = true
       this.openCategory((type || this.type) as ContentType)
     },
+    switchType(type: ContentType) {
+      if (!(type in CONTENT_TYPES) || type === this.type) return
+      const kw = this.kw
+      this.resetSearch()
+      this.type = type
+      this.kw = kw
+      if (kw.trim()) this.doStoreSearch()
+    },
     closeSearch() {
       this.discover = false
       useLibStore().bump()

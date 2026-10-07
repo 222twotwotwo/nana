@@ -5,7 +5,6 @@ import { useSearchStore } from '../../stores/search'
 import { useLibStore } from '../../stores/lib'
 import { savedContent } from '../../services/catalog'
 import { settings } from '../../services/settings'
-import { synthAmbience } from '../../services/music'
 import { importTxtFile } from '../../services/txt'
 import { addMusicFile } from '../../services/music'
 import { CONTENT_TYPES } from '../../constants'
@@ -67,19 +66,6 @@ async function onMusic(e: Event) {
   app.toast('已加入收藏')
 }
 
-async function onSynth(e: MouseEvent) {
-  const b = e.target as HTMLButtonElement
-  b.disabled = true
-  try {
-    await synthAmbience(b.dataset.synth as any)
-    app.toast('氛围音已加入收藏')
-    lib.bump()
-  } catch (err: any) {
-    app.toast('生成失败：' + err.message)
-  }
-  b.disabled = false
-}
-
 window.addEventListener('moyin:import-txt', () => fileImport.value?.click())
 </script>
 
@@ -87,7 +73,7 @@ window.addEventListener('moyin:import-txt', () => fileImport.value?.click())
   <section id="page-library" class="page">
     <div class="page-inner">
       <div class="home-heading">
-        <h1 class="big-title">书库</h1>
+        <h1 class="big-title">库墙</h1>
         <div class="category-tabs compact" id="libraryTypeSeg" aria-label="收藏分类" @click="onCategoryClick">
           <button v-for="(m, t) in CONTENT_TYPES" :key="t" :data-ctype="t" :class="{ on: search.type === t }"
             :aria-pressed="search.type === t ? 'true' : 'false'">{{ m.label }}</button>
@@ -95,12 +81,6 @@ window.addEventListener('moyin:import-txt', () => fileImport.value?.click())
       </div>
       <input type="file" id="fileImport" ref="fileImport" accept=".txt" multiple class="hidden" @change="onTxt">
       <input type="file" id="fileMusic" ref="fileMusic" accept="audio/*" multiple class="hidden" @change="onMusic">
-      <div id="libraryAmbience" class="row" :class="{ hidden: search.type !== 'music' }">
-        <span class="muted">合成氛围音：</span>
-        <button class="btn small" data-synth="rain" @click="onSynth">夜雨</button>
-        <button class="btn small" data-synth="wave" @click="onSynth">海浪</button>
-        <button class="btn small" data-synth="drone" @click="onSynth">低鸣</button>
-      </div>
       <div class="book-grid" id="bookGrid" :class="{ listview: settings.viewMode === 'list' }">
         <button ref="addBtn" class="library-add" :aria-label="`添加${meta().label}`" :title="`添加${meta().label}`" @click="onAdd">
           <span class="cover"><span aria-hidden="true">＋</span></span>

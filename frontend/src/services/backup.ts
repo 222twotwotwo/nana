@@ -41,7 +41,7 @@ export const MoyinBackup = {
   async read(file: { size: number; text(): Promise<string> }) {
     if (file.size > 200 * 1024 * 1024) throw new Error('备份超过 200 MB')
     const data = JSON.parse(await file.text())
-    if (data.format !== 'moyin-backup' || data.version !== 1) throw new Error('不是墨音备份文件')
+    if (data.format !== 'moyin-backup' || data.version !== 1) throw new Error('不是nana备份文件')
     for (const name of ['books', 'music', 'analyses']) {
       if (!Array.isArray(data.stores?.[name])) throw new Error('备份结构不完整')
       for (const row of data.stores[name]) {

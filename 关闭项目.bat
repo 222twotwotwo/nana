@@ -15,7 +15,7 @@ try {
     $services = @(Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" |
         Where-Object { $_.CommandLine -match $pattern })
     if ($services.Count -eq 0) {
-        Write-Host '未发现由快捷启动运行的墨音服务；旧启动窗口中的服务请按 Ctrl+C 关闭。'
+        Write-Host '未发现由快捷启动运行的nana服务；旧启动窗口中的服务请按 Ctrl+C 关闭。'
         exit 0
     }
     foreach ($service in $services) {
@@ -23,7 +23,7 @@ try {
         if ($process) {
             Stop-Process -InputObject $process -Force
             if (-not $process.WaitForExit(10000)) { throw '服务未能在 10 秒内退出。' }
-            Write-Host "墨音已关闭（PID $($service.ProcessId)）。"
+            Write-Host "nana已关闭（PID $($service.ProcessId)）。"
         }
     }
 } catch {

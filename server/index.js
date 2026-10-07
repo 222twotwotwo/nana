@@ -93,7 +93,7 @@ function createServer(service) {
 async function start() {
   const service=new ReaderService(); await service.init();
   const server=createServer(service),port=Number(process.env.PORT||8761),host=process.env.HOST||'127.0.0.1';
-  server.listen(port,host,()=>console.log(`墨音已启动：http://${host}:${port}`));
+  server.listen(port,host,()=>console.log(`nana已启动：http://${host}:${port}`));
   server.on('error',e=>{console.error(e.code==='EADDRINUSE'?`端口 ${port} 已占用，可设置 PORT 使用其他端口`:e.message);process.exitCode=1;});
   const timer=setInterval(()=>service.pruneCache().catch(console.error),3600000);timer.unref();
   for(const signal of ['SIGINT','SIGTERM']) process.on(signal,()=>server.close(()=>process.exit(0)));

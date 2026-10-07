@@ -16,7 +16,7 @@ try {
         Where-Object { $_.CommandLine -match $pattern } | Select-Object -First 1
     if ($existing) {
         $serviceProcess = Get-Process -Id $existing.ProcessId
-        Write-Host '墨音已在运行，无需重复启动。'
+        Write-Host 'nana已在运行，无需重复启动。'
     } else {
         $node = (Get-Command node.exe -ErrorAction Stop).Source
         if ([int]((& $node --version).TrimStart('v').Split('.')[0]) -lt 22) {
@@ -41,7 +41,7 @@ try {
             try {
                 $health = Invoke-RestMethod -Uri ('http://127.0.0.1:' + $listener.LocalPort + '/api/health') -TimeoutSec 2
                 if ($health.ok) {
-                    Write-Host "墨音已启动：$url（PID $($serviceProcess.Id)）"
+                    Write-Host "nana已启动：$url（PID $($serviceProcess.Id)）"
                     exit 0
                 }
             } catch {}

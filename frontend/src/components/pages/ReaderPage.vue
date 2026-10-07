@@ -276,6 +276,9 @@ watch(() => app.page, p => { if (p !== 'reader') reader.menuOpen = false })
 
 <template>
   <section id="page-reader" class="page">
+    <button class="float-back" title="返回库墙" aria-label="返回库墙" @click="app.showPage('library')">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
     <div id="rdHead"><span id="rdHeadTitle"><b>{{ book?.title }}</b> {{ cv.title }}</span></div>
     <div id="readerScroll" ref="scRef" :class="{ 'reader-paged': paged }" @scroll="onScroll" @wheel="onWheel">
       <article id="chapterBody" ref="bodyRef" :class="{ comic: isComic, 'reader-paged': paged }"

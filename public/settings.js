@@ -74,7 +74,7 @@ async function renderSettings(){
     (await idb()).close();
     _dbP = null;
     const deletion = indexedDB.deleteDatabase('novel-reader');
-    deletion.onblocked = ()=>toast('请关闭其他墨音标签页后重试');
+    deletion.onblocked = ()=>toast('请关闭其他nana标签页后重试');
     deletion.onsuccess = ()=>location.reload();
     localStorage.removeItem('nr-settings');
     localStorage.removeItem('nr-mapping');

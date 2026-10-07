@@ -8,7 +8,7 @@ const chapterLoads = new Map<string, Promise<string>>()
 export async function saveChapter(book: BookRecord, idx: number, text: string) {
   const work = (writes.get(book.id) || Promise.resolve()).catch(() => {}).then(async () => {
     const current = await dbGet<BookRecord>('books', book.id)
-    if (!current) throw new Error('书籍已从书库移除')
+    if (!current) throw new Error('书籍已从库墙移除')
     current.chapters[idx].text = text
     current.charCount = current.chapters.reduce((n, c) => n + (c.text?.length || 0), 0)
     await dbPut('books', current)
