@@ -156,6 +156,13 @@ function retryPage(i: number) {
 }
 function retryChapter() { loadChapter(reader.chIdx) }
 
+/* ---------- 点击正文区域自动折叠多余 UI ---------- */
+function onReaderClick() {
+  // 点击正文时收起左侧章节抽屉与右下浮动菜单，只保留折叠态胶囊
+  if (reader.drawerOpen) reader.drawerOpen = false
+  if (reader.menuOpen) { reader.menuOpen = false; menuFontOpen.value = false }
+}
+
 /* ---------- 章节导航 ---------- */
 function navChapter(delta: number) {
   const bk = reader.book
@@ -163,7 +170,14 @@ function navChapter(delta: number) {
   const next = reader.chIdx + delta
   if (next >= 0 && next < bk.chapters.length) reader.gotoChapter(next)
 }
-function pickChapter(i: number) { reader.gotoChapter(i) }
+function pickChapter(i: number) { reader.drawerOpen = false; reader.gotoChapter(i) }
+function toggleDrawer() {
+  if (reader.drawerOpen) { reader.drawerOpen = false; return }
+  // 打开章节抽屉时收起浮动菜单，避免两层悬浮 UI 同时遮挡正文
+  reader.menuOpen = false
+  menuFontOpen.value = false
+  reader.drawerOpen = true
+}
 function onMenuCine() {
   reader.menuOpen = false
   app.cineBookId = reader.book!.id
@@ -280,7 +294,8 @@ watch(() => app.page, p => { if (p !== 'reader') reader.menuOpen = false })
       <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
     </button>
     <div id="rdHead"><span id="rdHeadTitle"><b>{{ book?.title }}</b> {{ cv.title }}</span></div>
-    <div id="readerScroll" ref="scRef" :class="{ 'reader-paged': paged }" @scroll="onScroll" @wheel="onWheel">
+    <div id="readerScroll" ref="scRef" :class="{ 'reader-paged': paged }" @scroll="onScroll" @wheel="onWheel"
+      @click="onReaderClick">
       <article id="chapterBody" ref="bodyRef" :class="{ comic: isComic, 'reader-paged': paged }"
         :style="{ fontSize: settings.fontSize + 'px' }">
         <template v-if="cv.mode === 'loading'">
@@ -326,7 +341,7 @@ watch(() => app.page, p => { if (p !== 'reader') reader.menuOpen = false })
     </aside>
     <div id="rdFab">
       <div id="rdMenu" :class="{ hidden: !reader.menuOpen }">
-        <div class="rm-row" @click="reader.drawerOpen = !reader.drawerOpen">
+        <div class="rm-row" @click="toggleDrawer">
           ☰ 章节目录<span class="rm-r">{{ reader.chIdx + 1 }}/{{ book?.chapters.length }}</span>
         </div>
         <div class="rm-sep" />
@@ -347,9 +362,8 @@ watch(() => app.page, p => { if (p !== 'reader') reader.menuOpen = false })
         </div>
         <div class="rm-sep" />
         <div class="rm-btns">
-          <button id="rmBack" title="返回收藏" @click="reader.menuOpen = false; app.showPage('library')">⤴</button>
           <button id="rmAmb" :class="{ on: reader.ambOn }" title="伴读开关" @click="toggleAmb">♪</button>
-          <button id="rmToc2" title="章节列表" @click="reader.drawerOpen = !reader.drawerOpen">☰</button>
+          <button id="rmToc2" title="章节列表" @click="toggleDrawer">☰</button>
         </div>
       </div>
       <div id="fabBar" @click.stop="reader.menuOpen = !reader.menuOpen">

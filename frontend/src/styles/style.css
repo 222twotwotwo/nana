@@ -116,7 +116,8 @@ input[type=number]{width:64px; padding:4px 6px; border:1px solid var(--line); bo
 .sm-head .grow{min-width:0}
 #storeErrors{color:var(--danger); overflow-wrap:anywhere; margin-bottom:10px}
 .music-player-links{margin:16px 0}
-#animeVideo{width:100%; max-height:65vh; background:#000; border-radius:12px; margin-top:20px}
+#animePlayerMount{width:100%; aspect-ratio:16/9; max-height:65vh; background:#000; border-radius:12px; margin-top:20px; overflow:hidden}
+#animePlayerMount video{object-fit:contain}
 button:focus-visible,a:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
 .hero{
   border-radius:20px; padding:26px 28px; color:#fff; margin-bottom:24px; position:relative; overflow:hidden;
@@ -206,12 +207,24 @@ body.dark .float-back:hover{background:var(--panel)}
 /* 右下浮动菜单（复刻图书 App） */
 #rdFab{position:absolute; right:22px; bottom:24px; z-index:30; display:flex; flex-direction:column; align-items:flex-end; gap:10px}
 #fabBar{
-  display:flex; align-items:center; gap:14px; background:var(--blur); color:#fff; backdrop-filter:blur(14px);
-  border-radius:999px; padding:12px 20px; font-size:13.5px; box-shadow:var(--shadow-lg); cursor:pointer;
+  display:flex; align-items:center; gap:14px;
+  background:rgba(30,30,34,.38);
+  backdrop-filter:blur(20px) saturate(170%);
+  -webkit-backdrop-filter:blur(20px) saturate(170%);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:999px; padding:12px 20px; font-size:13.5px;
+  box-shadow:0 8px 32px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.28);
+  color:#fff; cursor:pointer;
 }
 #fabBar .fb-ico{font-size:15px}
 #rdMenu{
-  width:250px; background:var(--blur); backdrop-filter:blur(18px); border-radius:18px; box-shadow:var(--shadow-lg);
+  width:250px;
+  background:rgba(30,30,34,.48);
+  backdrop-filter:blur(24px) saturate(170%);
+  -webkit-backdrop-filter:blur(24px) saturate(170%);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.22);
   overflow:hidden; color:#fff; animation:popin .18s ease;
 }
 #rdMenu .rm-row{display:flex; align-items:center; padding:13px 18px; font-size:14px; cursor:pointer; gap:10px}

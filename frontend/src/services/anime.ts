@@ -13,6 +13,14 @@ export function loadHls(): Promise<any> {
   return hlsLoader
 }
 
+let artLoader: Promise<any> | null = null
+
+export function loadArtplayer(): Promise<any> {
+  if (artLoader) return artLoader
+  artLoader = import('artplayer').then(module => module.default).catch(error => { artLoader = null; throw error })
+  return artLoader
+}
+
 export const animeState = reactive({
   book: null as BookRecord | null,
   episode: 0,

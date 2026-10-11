@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useAppStore } from '../../stores/app'
 import { useSearchStore } from '../../stores/search'
-import { animeState, loadHls, registerAnimeStop, bumpAnimeRequest, currentAnimeRequest, findAlternativeAnime, episodeKey } from '../../services/anime'
+import { animeState, loadHls, loadArtplayer, registerAnimeStop, bumpAnimeRequest, currentAnimeRequest, findAlternativeAnime, episodeKey } from '../../services/anime'
 import type { AnimeAttempt } from '../../services/anime'
 import { api, sourceId, SOURCES } from '../../services/server'
 import { getProgress, saveMediaProgress } from '../../services/settings'
@@ -25,7 +25,9 @@ const view = ref({
 })
 
 let hls: any = null
+let art: any = null
 let videoEl: HTMLVideoElement | null = null
+let mountEl: HTMLElement | null = null
 // 每集已尝试过的源（key: bookId:idx），自动换源时逐个排除
 const failedSources = new Map<string, Set<string>>()
 const failedUrls = new Map<string, Set<string>>()
@@ -42,20 +44,21 @@ function note(attempt: AnimeAttempt) {
   else attempts.value[index] = attempt
 }
 
-function setVideo(el: any) {
-  videoEl = el as HTMLVideoElement
+function setMount(el: any) {
+  mountEl = el as HTMLElement
 }
 
 function cleanup() {
   detachPlayer()
   detachPlayer = () => {}
-  if (videoEl) {
-    videoEl.pause()
-    videoEl.removeAttribute('src')
-    videoEl.load()
-  }
   if (hls) { hls.destroy(); hls = null }
+  if (art) {
+    const instance = art
+    art = null
+    try { instance.destroy(true) } catch { /* 重复销毁时忽略 */ }
+  }
   videoEl = null
+  mountEl = null
 }
 
 // 原版 stopAnime：切页离开时由 App 调用
@@ -101,12 +104,14 @@ async function playAnime(idx: number, resumeTime?: number) {
     const original = musicPageUrl(chapter.url || '')
     view.value = { mode: 'ready', title: book.title || '', errMsg: '', stream, original, chapterTitle: chapter.title || `第 ${idx + 1} 集`, idx, switching: false }
     await nextTick()
-    if (!current() || !videoEl) return
-    const video = videoEl
+    if (!current() || handled || !mountEl) return
+    const container = mountEl
     let lastSave = 0
     let verified = false
-    const save = () => { if (verified) saveMediaProgress(book.id, idx, video) }
-    const metadata = () => { if (current() && resume > 0 && resume < video.duration) video.currentTime = resume }
+    const save = () => { if (verified && videoEl) saveMediaProgress(book.id, idx, videoEl) }
+    const metadata = () => {
+      if (current() && resume > 0 && videoEl && Number.isFinite(videoEl.duration) && resume < videoEl.duration) videoEl.currentTime = resume
+    }
     const loaded = () => {
       if (!current() || handled || verified) return
       verified = true
@@ -118,38 +123,65 @@ async function playAnime(idx: number, resumeTime?: number) {
     }
     const tick = () => { if (current() && Date.now() - lastSave > 1000) { lastSave = Date.now(); save() } }
     const mediaError = () => { void fail(new Error('视频加载或解码失败')) }
-    video.addEventListener('loadedmetadata', metadata)
-    video.addEventListener('loadeddata', loaded)
-    video.addEventListener('timeupdate', tick)
-    video.addEventListener('pause', save)
-    video.addEventListener('ended', save)
-    video.addEventListener('error', mediaError)
     timer = setTimeout(() => { void fail(new Error('视频加载超时')) }, 45000)
     detachPlayer = () => {
       clearTimeout(timer)
       save()
-      video.removeEventListener('loadedmetadata', metadata)
-      video.removeEventListener('loadeddata', loaded)
-      video.removeEventListener('timeupdate', tick)
-      video.removeEventListener('pause', save)
-      video.removeEventListener('ended', save)
-      video.removeEventListener('error', mediaError)
+      if (art) {
+        art.off('video:loadedmetadata', metadata)
+        art.off('video:loadeddata', loaded)
+        art.off('video:timeupdate', tick)
+        art.off('video:pause', save)
+        art.off('video:ended', save)
+        art.off('video:error', mediaError)
+      }
     }
     const needHls = /\.m3u8(?:$|[?#])/i.test(d.stream)
-    if (needHls) {
-      const Hls = await loadHls()
-      if (!current() || handled) return
-      if (Hls.isSupported()) {
-        hls = new Hls()
-        hls.on(Hls.Events.ERROR, (_: unknown, data: any) => { if (data.fatal) void fail(new Error(`视频加载失败：${data.details}`)) })
-        hls.loadSource(stream)
-        hls.attachMedia(video)
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) video.src = stream
-      else throw new Error('当前浏览器不支持 HLS 播放')
-    } else {
-      video.src = stream
-      video.load()
+    const ArtPlayer = await loadArtplayer()
+    if (!current() || handled) return
+    // ArtPlayer customType：m3u8 交给 hls.js 解码，其余格式直接交给浏览器
+    const attachHls = (video: HTMLVideoElement, url: string) => {
+      videoEl = video
+      void (async () => {
+        const Hls = await loadHls()
+        if (!current() || handled) return
+        if (Hls.isSupported()) {
+          hls = new Hls()
+          hls.on(Hls.Events.ERROR, (_: unknown, data: any) => { if (data.fatal) void fail(new Error(`视频加载失败：${data.details}`)) })
+          hls.loadSource(url)
+          hls.attachMedia(video)
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) video.src = url
+        else void fail(new Error('当前浏览器不支持 HLS 播放'))
+      })()
     }
+    const options: Record<string, unknown> = {
+      container,
+      url: stream,
+      setting: true,
+      playbackRate: true,
+      aspectRatio: true,
+      flip: true,
+      fullscreen: true,
+      fullscreenWeb: true,
+      miniProgressBar: true,
+      pip: true,
+      airplay: true,
+      hotkey: false,
+      playsInline: true,
+      moreVideoAttr: { preload: 'metadata' }
+    }
+    if (needHls) {
+      options.type = 'm3u8'
+      options.customType = { m3u8: attachHls }
+    }
+    art = new ArtPlayer(options)
+    videoEl = art.video
+    art.on('video:loadedmetadata', metadata)
+    art.on('video:loadeddata', loaded)
+    art.on('video:timeupdate', tick)
+    art.on('video:pause', save)
+    art.on('video:ended', save)
+    art.on('video:error', mediaError)
   } catch (e: any) {
     await fail(e)
   }
@@ -297,7 +329,7 @@ const epSub = computed(() => {
           </p>
         </template>
         <template v-else-if="view.mode === 'ready'">
-          <video id="animeVideo" :ref="setVideo" controls playsinline preload="metadata" />
+          <div id="animePlayerMount" :ref="setMount" />
           <div class="section-heading">
             <span>{{ view.chapterTitle }}</span>
             <a v-if="view.original" class="btn small" :href="view.original" target="_blank" rel="noopener noreferrer">原站</a>
