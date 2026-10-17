@@ -1,0 +1,3 @@
+div#cineBox.page-inner
+  h1.big-title :: 情境配乐
+  p.muted :: 库墙为空，请先导入小说（漫画暂不支持情绪分析）

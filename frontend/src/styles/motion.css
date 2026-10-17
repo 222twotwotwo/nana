@@ -1,0 +1,477 @@
+/* ==========================================================================
+   动效层 · Apple 风格（页面切换 / 浮层 / 按钮）
+   --------------------------------------------------------------------------
+   设计原则：
+   1. 只加动效，不改静态布局——所有动画元素在「静止态」的几何尺寸与原版一致。
+   2. 页面切换不卸载组件（原版用 .hidden 切换 display），因此滚动位置、
+      已加载数据、异步请求全部保持原状。
+   3. 曲线统一取 Apple 的减速曲线 cubic-bezier(.32,.72,0,1)，短交互另配
+      轻微回弹曲线；时长收拢成四档令牌，避免各处硬编码。
+   4. 尊重 prefers-reduced-motion：把时长令牌压到 1ms，动画等同关闭。
+   5. 降级安全：滑动指示器只在测量成功后接管高亮（.has-pill），
+      测量失败时保留原有 .on 底色，功能与外观不退化。
+   ========================================================================== */
+
+:root{
+  /* 曲线 */
+  --ease:cubic-bezier(.32,.72,0,1);            /* 主曲线：快速起步、长尾减速 */
+  --ease-out:cubic-bezier(.25,.8,.35,1);       /* 通用减速 */
+  --ease-in-out:cubic-bezier(.45,0,.25,1);     /* 双向对称 */
+  --ease-spring:cubic-bezier(.34,1.28,.52,1);  /* 轻微回弹：小控件 */
+  /* 时长 */
+  --dur-press:140ms;   /* 按压反馈 */
+  --dur-fast:220ms;    /* 悬停、颜色 */
+  --dur-med:340ms;     /* 浮层、抽屉 */
+  --dur-slow:460ms;    /* 页面切换 */
+}
+
+/* ==========================================================================
+   1 · 页面切换舞台
+   --------------------------------------------------------------------------
+   静止态：只有当前页在文档流里（flex:1），几何与原版完全一致。
+   切换期：**离场页**临时绝对定位铺满 main（脱离文档流，不影响入场页），
+          入场页保持常规流并做 transform/opacity 动画。
+   main 无内边距，故 inset:0 与 flex:1 的盒子完全重合。
+   ========================================================================== */
+main > section.pg-leaving{
+  /* #page-music / #page-reader 自带 position:relative，需强制覆盖 */
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1;
+  backface-visibility:hidden;
+}
+main > section.pg-entering{
+  position:relative; z-index:2;
+  backface-visibility:hidden;
+}
+main > section.pg-entering,
+main > section.pg-leaving{
+  transition:transform var(--dur-slow) var(--ease), opacity var(--dur-med) var(--ease);
+}
+/* 离场页在被压住时压暗，形成层级纵深感（iOS push 的观感） */
+main > section.pg-leaving{background:var(--bg)}
+main > section.pg-forward.pg-entering{box-shadow:-14px 0 34px rgba(20,16,12,.16)}
+main > section.pg-back.pg-leaving{box-shadow:-14px 0 34px rgba(20,16,12,.16)}
+body.dark main > section.pg-forward.pg-entering{box-shadow:-14px 0 34px rgba(0,0,0,.5)}
+body.dark main > section.pg-back.pg-leaving{box-shadow:-14px 0 34px rgba(0,0,0,.5)}
+
+/* 前进（进入内容详情：阅读 / 音乐 / 番剧） */
+main > section.pg-forward.pg-entering.pg-from{transform:translate3d(64px,0,0); opacity:0}
+main > section.pg-forward.pg-entering.pg-to{transform:none; opacity:1}
+main > section.pg-forward.pg-leaving.pg-from{transform:none; opacity:1}
+main > section.pg-forward.pg-leaving.pg-to{transform:translate3d(-26%,0,0); opacity:0}
+/* 后退（从内容详情返回） */
+main > section.pg-back.pg-entering.pg-from{transform:translate3d(-26%,0,0); opacity:0}
+main > section.pg-back.pg-entering.pg-to{transform:none; opacity:1}
+main > section.pg-back.pg-leaving.pg-from{transform:none; opacity:1}
+main > section.pg-back.pg-leaving.pg-to{transform:translate3d(64px,0,0); opacity:0}
+/* 同级（顶部标签之间 / 设置、情境配乐） */
+main > section.pg-lateral.pg-entering.pg-from{transform:translate3d(0,12px,0) scale(.994); opacity:0}
+main > section.pg-lateral.pg-entering.pg-to{transform:none; opacity:1}
+main > section.pg-lateral.pg-leaving.pg-from{transform:none; opacity:1}
+main > section.pg-lateral.pg-leaving.pg-to{transform:translate3d(0,-8px,0) scale(.996); opacity:0}
+
+/* 入场页里的卡片依次浮起（仅在切换窗口内、仅作用于网格子项；
+   窗口结束即移除类名，动画被取消并回到自然可见态，不会残留隐藏元素） */
+@keyframes cardRise{from{opacity:0; transform:translate3d(0,14px,0) scale(.985)} to{opacity:1; transform:none}}
+@keyframes fadeRise{from{opacity:0; transform:translate3d(0,10px,0)} to{opacity:1; transform:none}}
+main.pg-running .pg-entering .book-grid > *,
+main.pg-running .pg-entering .home-wall > *{animation:cardRise var(--dur-med) var(--ease) backwards}
+main.pg-running .pg-entering .big-title,
+main.pg-running .pg-entering .home-heading,
+main.pg-running .pg-entering .anime-head,
+main.pg-running .pg-entering .home-resume{animation:fadeRise var(--dur-med) var(--ease) backwards}
+main.pg-running .pg-entering .book-grid > :nth-child(2),
+main.pg-running .pg-entering .home-wall > :nth-child(2){animation-delay:32ms}
+main.pg-running .pg-entering .book-grid > :nth-child(3),
+main.pg-running .pg-entering .home-wall > :nth-child(3){animation-delay:64ms}
+main.pg-running .pg-entering .book-grid > :nth-child(4),
+main.pg-running .pg-entering .home-wall > :nth-child(4){animation-delay:96ms}
+main.pg-running .pg-entering .book-grid > :nth-child(5),
+main.pg-running .pg-entering .home-wall > :nth-child(5){animation-delay:128ms}
+main.pg-running .pg-entering .book-grid > :nth-child(6),
+main.pg-running .pg-entering .home-wall > :nth-child(6){animation-delay:160ms}
+main.pg-running .pg-entering .book-grid > :nth-child(7),
+main.pg-running .pg-entering .home-wall > :nth-child(7){animation-delay:192ms}
+main.pg-running .pg-entering .book-grid > :nth-child(n+8),
+main.pg-running .pg-entering .home-wall > :nth-child(n+8){animation-delay:224ms}
+
+/* ==========================================================================
+   2 · 顶栏（沉浸式页面折叠收起）
+   --------------------------------------------------------------------------
+   原版直接 display:none，主区会「跳」一下。
+   这里用 max-height 过渡：盒高本身始终是内容自然高度（height 不设），
+   所以 --chrome-h 即使偏大或过期也**只影响动画节奏、绝不影响布局**——
+   静止态几何与原版逐像素一致（桌面 56px / 移动 58px）。
+   ========================================================================== */
+#chrome{
+  max-height:var(--chrome-h, 80px);
+  overflow:hidden;
+  transition:max-height var(--dur-slow) var(--ease), padding var(--dur-slow) var(--ease),
+             opacity var(--dur-fast) var(--ease), transform var(--dur-slow) var(--ease);
+}
+#chrome.chrome-hidden{
+  max-height:0; padding-top:0; padding-bottom:0; opacity:0;
+  transform:translateY(-10px); pointer-events:none;
+}
+#chrome .seg, #chrome .chrome-right{
+  transition:opacity var(--dur-med) var(--ease), transform var(--dur-slow) var(--ease);
+}
+#chrome.chrome-hidden .seg,
+#chrome.chrome-hidden .chrome-right{opacity:0; transform:translateY(-14px)}
+
+/* ==========================================================================
+   3 · 分段控件滑动指示器（iOS 风格）
+   --------------------------------------------------------------------------
+   指示器是**瞬时**的：静止态完全不存在，激活底色仍由按钮自身的 .on 绘制，
+   因此静止态与原版逐像素一致。
+
+   原因（实测，见 docs/motion.md「滑动指示器」）：把激活底色从按钮挪到
+   另一个元素上绘制，会让 Chrome 放弃次像素（LCD）抗锯齿、改用灰度抗锯齿，
+   文字渲染随之改变；position:relative / z-index / isolation 都不是原因，
+   「底色由谁绘制」才是。所以只在滑动的那一小段时间里把底色交给指示器。
+
+   .seg 本身已是 position:absolute（用于居中），本身就是定位祖先，无需改动。
+   ========================================================================== */
+.category-tabs{position:relative}
+.seg-pill, .cat-pill{
+  position:absolute; left:0; top:0; width:0; height:0; border-radius:999px;
+  pointer-events:none; z-index:0; opacity:0;
+  transition:transform var(--dur-med) var(--ease-spring),
+             width var(--dur-med) var(--ease-spring),
+             height var(--dur-med) var(--ease-spring);
+}
+.pill-active > .seg-pill, .pill-active > .cat-pill{opacity:1}
+.seg-pill{background:var(--bg)}
+.cat-pill{background:var(--tab-on)}
+.seg button, .category-tabs button{position:relative; z-index:1}
+/* 仅在滑动期间把底色交给指示器；滑动结束后 .on 重新接管 */
+.pill-active.seg button.on,
+.pill-active.category-tabs button.on{background:transparent}
+.seg button, .category-tabs button{
+  transition:color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease),
+             opacity var(--dur-fast) var(--ease);
+}
+.seg button:not(.on):hover, .category-tabs button:not(.on):hover{background:transparent}
+.seg button:active, .category-tabs button:active{opacity:.55}
+/* 移动端 #mainSeg 被改为 position:static，指示器会失去定位祖先；改回 relative。
+   relative 不设偏移量，布局位置与 static 完全一致。 */
+@media (max-width:760px){ #mainSeg{position:relative} }
+
+/* ==========================================================================
+   4 · 按钮与可点区域
+   ========================================================================== */
+button{-webkit-tap-highlight-color:transparent}
+button{
+  transition:transform var(--dur-press) var(--ease-spring),
+             opacity var(--dur-fast) var(--ease),
+             background-color var(--dur-fast) var(--ease),
+             border-color var(--dur-fast) var(--ease),
+             color var(--dur-fast) var(--ease),
+             box-shadow var(--dur-fast) var(--ease);
+}
+/* 按压回弹：所有按钮默认获得轻量缩放反馈 */
+button:active{transform:scale(.96)}
+button:disabled:active{transform:none}
+
+/* 胶囊按钮：悬停轻微抬起 + 阴影加深 */
+.btn:hover{transform:translateY(-1px); box-shadow:0 4px 16px rgba(30,25,20,.13)}
+body.dark .btn:hover{box-shadow:0 4px 16px rgba(0,0,0,.45)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn.primary:hover{opacity:1; box-shadow:0 5px 18px rgba(200,98,46,.34)}
+.btn:disabled:hover{transform:none; box-shadow:var(--shadow)}
+
+/* 圆形图标按钮 */
+.chrome-right button:hover{transform:translateY(-1px); box-shadow:0 6px 18px rgba(30,25,20,.16)}
+.chrome-right button:active{transform:scale(.92)}
+body.dark .chrome-right button:hover{box-shadow:0 6px 18px rgba(0,0,0,.5)}
+
+/* 悬浮返回键 */
+.float-back:hover{transform:translateY(-1px) scale(1.04)}
+.float-back:active{transform:scale(.9)}
+
+/* 卡片 / 封面 */
+.cover{transition:transform var(--dur-med) var(--ease), box-shadow var(--dur-med) var(--ease)}
+.bk:hover .cover, .sr:hover .cover{transform:translateY(-5px); box-shadow:0 12px 26px rgba(30,25,20,.24)}
+.bk:active .cover, .sr:active .cover{transform:translateY(-1px) scale(.985)}
+.catalog-open{transition:transform var(--dur-press) var(--ease-spring)}
+.catalog-open:active{transform:scale(.985)}
+.bc-more{transition:background-color var(--dur-fast) var(--ease), transform var(--dur-press) var(--ease-spring)}
+.bc-more:active{transform:scale(.88)}
+
+/* 标签 chip：选中时轻微弹一下 */
+.chip{transition:background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+                  border-color var(--dur-fast) var(--ease), transform var(--dur-press) var(--ease-spring)}
+.chip:hover{transform:translateY(-1px)}
+.chip.on{transform:scale(1.04)}
+.chip:active{transform:scale(.94)}
+
+/* 列表 / 抽屉内的行 */
+.pop button, #rdMenu .rm-row, .music-row, .ch-item, .mf-row{
+  transition:background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+             transform var(--dur-press) var(--ease-spring);
+}
+.pop button:active, .mf-row:active{transform:scale(.985)}
+
+/* 进度条填充：宽度变化平滑推进 */
+.prog i{transition:width var(--dur-med) var(--ease)}
+
+/* ==========================================================================
+   5 · 浮层：详情弹窗 / 确认框
+   --------------------------------------------------------------------------
+   .anim-hidden 是 .hidden 的「可过渡版本」：仍保留 hidden 类名（既有校验
+   脚本按 classList.contains('hidden') 判断开关状态），但改用透明度 + 可见性
+   隐藏，从而让退场也有动画。需 !important 压过 .hidden 的 display:none。
+   ========================================================================== */
+#storeModal.anim-hidden, #appConfirm.anim-hidden{
+  display:flex !important;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity var(--dur-med) var(--ease), visibility 0s linear var(--dur-med);
+}
+#storeModal, #appConfirm{
+  opacity:1; visibility:visible;
+  transition:opacity var(--dur-med) var(--ease), visibility 0s;
+}
+#storeModal .sm-box, #appConfirm .ac-box{
+  transform-origin:50% 62%;
+  transition:transform var(--dur-slow) var(--ease), opacity var(--dur-med) var(--ease);
+}
+#storeModal.anim-hidden .sm-box, #appConfirm.anim-hidden .ac-box{
+  transform:translate3d(0,18px,0) scale(.94); opacity:0;
+}
+#storeModal:not(.anim-hidden) .sm-box,
+#appConfirm:not(.anim-hidden) .ac-box{animation:overlayIn var(--dur-slow) var(--ease) backwards}
+@keyframes overlayIn{from{opacity:0; transform:translate3d(0,18px,0) scale(.94)} to{opacity:1; transform:none}}
+#smProgress .prog{animation:fadeRise var(--dur-med) var(--ease) backwards}
+
+/* ==========================================================================
+   6 · 浮层：⋯ 弹出菜单 / Toast
+   ========================================================================== */
+.pop{
+  transform-origin:top right;
+  transition:transform var(--dur-med) var(--ease-spring), opacity var(--dur-fast) var(--ease),
+             visibility 0s;
+}
+.pop.anim-hidden{
+  display:block !important; opacity:0; visibility:hidden; pointer-events:none;
+  transform:translateY(-8px) scale(.94);
+  transition:transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease),
+             visibility 0s linear var(--dur-fast);
+}
+.pop:not(.anim-hidden){animation:popIn var(--dur-med) var(--ease-spring) backwards}
+@keyframes popIn{from{opacity:0; transform:translateY(-8px) scale(.94)} to{opacity:1; transform:none}}
+
+#toast{
+  transform:translateX(-50%) translateY(14px) scale(.96);
+  transition:opacity var(--dur-med) var(--ease), transform var(--dur-slow) var(--ease-spring);
+}
+#toast.show{transform:translateX(-50%) translateY(0) scale(1)}
+
+/* ==========================================================================
+   7 · 阅读页：章节抽屉 / 浮动菜单 / 目录胶囊
+   ========================================================================== */
+#chDrawer{
+  transition:transform var(--dur-med) var(--ease), box-shadow var(--dur-med) var(--ease);
+  box-shadow:0 0 0 rgba(0,0,0,0);
+}
+#chDrawer.open{box-shadow:var(--shadow-lg)}
+#chDrawer .ch-item{transition:color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease),
+                               border-left-color var(--dur-fast) var(--ease), padding-left var(--dur-fast) var(--ease)}
+#chDrawer .ch-item.cur{font-weight:600}
+
+/* 浮动菜单：右下角弹出（原版 display:none 硬切）。
+   始终绝对定位在胶囊上方，不参与 #rdFab 的流布局：
+   原版收起时菜单是 display:none，所以 #rdFab 的盒高就等于胶囊高度（50px）。
+   若这里改用 visibility 保留占位，#rdFab 会被撑到 250×339，它的 bounding box
+   就会与右下角的悬浮音乐球重叠，使「阅读页悬浮球上移避让目录胶囊」的判断失效。
+   绝对定位后收起态不占位（几何与原版一致），展开时正好从胶囊上方滑出。 */
+#rdMenu{
+  position:absolute; right:0; bottom:calc(100% + 10px);
+  transform-origin:bottom right;
+  transition:transform var(--dur-med) var(--ease), opacity var(--dur-fast) var(--ease), visibility 0s;
+}
+#rdMenu.anim-hidden{
+  display:block !important; opacity:0; visibility:hidden; pointer-events:none;
+  transform:translate3d(0,10px,0) scale(.92);
+  transition:transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease),
+             visibility 0s linear var(--dur-fast);
+}
+#rdMenu:not(.anim-hidden){animation:fabIn var(--dur-med) var(--ease-spring) backwards}
+@keyframes fabIn{from{opacity:0; transform:translate3d(0,10px,0) scale(.92)} to{opacity:1; transform:none}}
+#rdMenu .rm-row:active{background:var(--tab-on)}
+#rdMenu .rm-btns button{transition:background-color var(--dur-fast) var(--ease), transform var(--dur-press) var(--ease-spring)}
+#rdMenu .rm-btns button:active{transform:scale(.9)}
+/* 字号面板展开。
+   用纯 opacity 过渡，不用 animation：
+   #rmFontPanel 位于 #rdMenu（backdrop-filter 毛玻璃）内部，动画期间父容器的
+   合成层会重新采样，在相邻分隔线上留下 2 行亮度渐变；若动画被下一次状态切换
+   打断还会停在中间态。改用 transition 后，展开态即最终态，不会残留。
+   display 保持 block（只是透明度/可见性变化），因此高度仍由内容决定。 */
+#rmFontPanel{
+  overflow:hidden;
+  transition:opacity var(--dur-med) var(--ease);
+}
+#rmFontPanel.anim-hidden{
+  display:block !important; opacity:0; visibility:hidden; pointer-events:none;
+}
+#rmFontPanel:not(.anim-hidden){opacity:1; visibility:visible}
+@keyframes panelDrop{from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none}}
+
+/* 目录胶囊 */
+#fabBar{transition:transform var(--dur-press) var(--ease-spring), background-color var(--dur-fast) var(--ease),
+                   box-shadow var(--dur-fast) var(--ease)}
+#fabBar:hover{background:var(--tab-hover); transform:translateY(-1px)}
+#fabBar:active{transform:scale(.95)}
+
+/* 正文换章动画由 ReaderPage.vue 用 Web Animations API 驱动（见 playChapterIn）：
+   那里能精确控制「先换内容、再淡入、后恢复滚动位置」的顺序，
+   CSS 动画做不到这个时序，且 #chapterBody 是多列容器不宜重建 DOM。 */
+
+/* ==========================================================================
+   8 · 音乐页 / 悬浮播放器
+   ========================================================================== */
+#disc{transition:box-shadow var(--dur-med) var(--ease)}
+#muCover{transition:background-color var(--dur-slow) var(--ease), color var(--dur-slow) var(--ease)}
+#tonearm{transition:transform var(--dur-slow) var(--ease)}
+.mu-ctrl button, .mu-top button, .mu-foot button{
+  transition:opacity var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease),
+             transform var(--dur-press) var(--ease-spring), color var(--dur-fast) var(--ease);
+}
+.mu-ctrl button:hover, .mu-foot button:hover{transform:scale(1.08)}
+.mu-ctrl button:active, .mu-top button:active, .mu-foot button:active{transform:scale(.9)}
+#muPlay{transition:transform var(--dur-press) var(--ease-spring), box-shadow var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease)}
+#muPlay:hover{transform:scale(1.06); box-shadow:0 8px 22px rgba(200,98,46,.36)}
+#muPlay:active{transform:scale(.94)}
+.music-row{animation:fadeRise var(--dur-med) var(--ease) backwards}
+#muDrawer{transition:border-color var(--dur-med) var(--ease)}
+#muBg{transition:background var(--dur-slow) var(--ease)}
+
+/* 悬浮球 ⇄ 迷你卡片 */
+#muFloat{
+  transition:transform var(--dur-med) var(--ease-spring), opacity var(--dur-fast) var(--ease),
+             bottom var(--dur-med) var(--ease);
+}
+#muFloat.anim-hidden{
+  display:flex !important; opacity:0; visibility:hidden; pointer-events:none;
+  transform:translateY(10px) scale(.9);
+  transition:transform var(--dur-med) var(--ease), opacity var(--dur-fast) var(--ease),
+             visibility 0s linear var(--dur-med);
+}
+/* 悬浮球 ⇄ 迷你卡片：用 <Transition name="mf"> 做变形。
+   离场的一方在过渡期间绝对定位到右下角（与容器对齐），
+   否则两个不同高度的元素同时存在会把容器撑高，产生抖动。
+
+   必须写 #muFloat 前缀：MusicFloat.vue 的 scoped 里 .mf-ball{position:relative}
+   编译后是 .mf-ball[data-v-xxx]，特异性 (0,2,0) 高于 .mf-leave-active(0,1,0)，
+   只写类名会被覆盖成 relative，离场元素仍留在流里。 */
+#muFloat .mf-enter-active{transition:transform var(--dur-med) var(--ease-spring), opacity var(--dur-fast) var(--ease)}
+#muFloat .mf-leave-active{
+  position:absolute !important; right:0; bottom:0;
+  transition:transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+#muFloat .mf-enter-from,
+#muFloat .mf-leave-to{opacity:0; transform:translate3d(0,10px,0) scale(.85)}
+.mf-icon, .mf-play{transition:background-color var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease),
+                                transform var(--dur-press) var(--ease-spring), color var(--dur-fast) var(--ease)}
+.mf-icon:active, .mf-play:active{transform:scale(.9)}
+.mf-list{animation:panelDrop var(--dur-med) var(--ease) backwards; overflow:hidden}
+
+/* ==========================================================================
+   9 · 主页 搜索 / 概览 切换、情境配乐折叠、来源行
+   --------------------------------------------------------------------------
+   这些容器 display:none → 显示时浏览器会重放 CSS 动画，因此只需「入场」
+   动画即可获得平滑切换，且不改变原有显隐语义与布局。
+   ========================================================================== */
+#homeSearch:not(.hidden), #homeOverview:not(.hidden){animation:modeIn var(--dur-slow) var(--ease) backwards}
+@keyframes modeIn{from{opacity:0; transform:translate3d(0,12px,0)} to{opacity:1; transform:none}}
+
+/* 情境配乐：节点编辑区展开 */
+.nodes{overflow:hidden; animation:panelDrop var(--dur-med) var(--ease) backwards}
+.ch-card{transition:box-shadow var(--dur-med) var(--ease), border-color var(--dur-med) var(--ease)}
+.source-row{transition:background-color var(--dur-fast) var(--ease)}
+.source-row:hover{background:var(--bg)}
+.node-row{animation:fadeRise var(--dur-med) var(--ease) backwards}
+
+/* 表单控件聚焦光晕 */
+input[type=text], input[type=password], select.sel,
+.node-row input, .node-row select, .map-row select{
+  transition:border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
+             background-color var(--dur-fast) var(--ease);
+}
+input[type=text]:focus, input[type=password]:focus, select.sel:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(200,98,46,.16);
+}
+
+/* 视图模式切换（网格 ⇄ 列表）时卡片重新排布 */
+.book-grid .catalog-card, .book-grid .library-add{
+  transition:transform var(--dur-med) var(--ease), opacity var(--dur-med) var(--ease);
+}
+
+/* ==========================================================================
+   10 · 番剧页：播放器状态切换（加载中 → 就绪 / 失败）与选集
+   --------------------------------------------------------------------------
+   三个分支用 v-if/v-else-if 切换，子节点被替换时会重放动画，
+   因此给直接子元素挂入场动画即可。用 backwards 填充：动画开始前就回到
+   自然态，不会让「已就绪」的播放器在动画结束后闪现。
+   ========================================================================== */
+#animePlayer > *{animation:fadeRise var(--dur-med) var(--ease) backwards}
+.anime-episodes button{transition:transform var(--dur-press) var(--ease-spring),
+                                 background-color var(--dur-fast) var(--ease),
+                                 border-color var(--dur-fast) var(--ease),
+                                 color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease)}
+.anime-episodes button:not(:disabled):hover{transform:translateY(-1px)}
+.anime-episodes button:not(:disabled):active{transform:scale(.95)}
+/* 换源记录折叠面板 */
+details{transition:opacity var(--dur-med) var(--ease)}
+details[open] > summary{color:var(--text)}
+summary{cursor:pointer; transition:color var(--dur-fast) var(--ease); padding:2px 0}
+details[open] > p{animation:fadeRise var(--dur-med) var(--ease) backwards}
+
+/* 情境配乐的情绪节点卡片 */
+.map-row{transition:background-color var(--dur-fast) var(--ease)}
+.map-row:hover{background:var(--bg)}
+
+/* ==========================================================================
+   10 · 主题切换：给主要表面加一次性颜色过渡
+   --------------------------------------------------------------------------
+   仅在切换瞬间由 JS 挂上 body.theme-anim，避免常驻 transition 带来的性能
+   与意外插值（例如拖拽进度条时背景被过渡拖慢）。
+   ========================================================================== */
+body.theme-anim, body.theme-anim #chrome, body.theme-anim .page, body.theme-anim .card,
+body.theme-anim .seg, body.theme-anim .category-tabs, body.theme-anim .pop,
+body.theme-anim .btn, body.theme-anim #muBg, body.theme-anim .sm-box, body.theme-anim .ac-box,
+body.theme-anim #storeModal, body.theme-anim #appConfirm, body.theme-anim #chDrawer,
+body.theme-anim #muDrawer, body.theme-anim .home-resume, body.theme-anim .chip,
+body.theme-anim .seg-pill, body.theme-anim .cat-pill, body.theme-anim .mf-card,
+body.theme-anim .source-row, body.theme-anim #chapterBody, body.theme-anim #readerScroll{
+  transition:background-color var(--dur-slow) var(--ease), color var(--dur-slow) var(--ease),
+             border-color var(--dur-slow) var(--ease), box-shadow var(--dur-slow) var(--ease),
+             background var(--dur-slow) var(--ease);
+}
+
+/* ==========================================================================
+   11 · 无障碍：减弱动效
+   ========================================================================== */
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-press:1ms; --dur-fast:1ms; --dur-med:1ms; --dur-slow:1ms}
+  main.pg-running .pg-entering .book-grid > *,
+  main.pg-running .pg-entering .home-wall > *,
+  main.pg-running .pg-entering .big-title,
+  main.pg-running .pg-entering .home-heading,
+  main.pg-running .pg-entering .anime-head,
+  main.pg-running .pg-entering .home-resume,
+  .music-row, .node-row, details[open] > p,
+  #animePlayer > *,
+  #homeSearch:not(.hidden), #homeOverview:not(.hidden),
+  .pop:not(.anim-hidden), #rdMenu:not(.anim-hidden),
+  #storeModal:not(.anim-hidden) .sm-box, #appConfirm:not(.anim-hidden) .ac-box,
+  .mf-list, .nodes, #smProgress .prog{animation:none !important}
+  button:active, .btn:hover, .btn:active, .chip:hover, .chip.on, .chip:active,
+  .bk:hover .cover, .sr:hover .cover, .catalog-open:active, .float-back:hover,
+  .mu-ctrl button:hover, .mu-foot button:hover, #muPlay:hover, #fabBar:hover,
+  #fabBar:active, #rdMenu .rm-btns button:active, .mf-icon:active, .mf-play:active,
+  .chrome-right button:hover, .chrome-right button:active, .bc-more:active,
+  .anime-episodes button:not(:disabled):hover,
+  .anime-episodes button:not(:disabled):active{transform:none !important}
+}

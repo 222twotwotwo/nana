@@ -1,0 +1,19 @@
+div#rdMenu
+  div#rmToc.rm-row :: ☰ 章节目录
+    span.rm-r :: 1/3
+  div.rm-sep
+  div#rmCine.rm-row :: 🎼 情境配乐
+    span.rm-r :: 未分析
+  div.rm-sep
+  div#rmFont.rm-row :: 主题与设置
+    span.rm-r :: 大小
+  div#rmFontPanel.rm-panel.hidden
+    div.row
+      button#rmfMinus.btn.small :: A−
+      button#rmfPlus.btn.small :: A+
+      div.grow
+      button#rmfTheme.btn.small :: ☾ 深色
+  div.rm-sep
+  div.rm-btns
+    button#rmAmb :: ♪
+    button#rmToc2 :: ☰

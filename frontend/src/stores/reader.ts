@@ -25,6 +25,9 @@ export const useReaderStore = defineStore('reader', {
         return startAnime(book)
       }
       const app = useAppStore()
+      // 原版 startReading：打开书籍时把书库分类切到该书类型
+      const { useSearchStore } = await import('./search')
+      useSearchStore().type = book.type || 'novel'
       this.book = book
       const p = getProgress()[bookId]
       this.chIdx = clamp(chIdx != null ? chIdx : (p ? p.chIdx : 0), 0, book.chapters.length - 1)

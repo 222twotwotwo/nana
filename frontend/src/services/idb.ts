@@ -57,15 +57,19 @@ export async function dbAll<T = any>(store: string): Promise<T[]> {
   })
 }
 
-export async function deleteDatabase() {
+/**
+ * 删除整个数据库。其它标签页仍持有连接时浏览器会阻塞删除，
+ * 此时以 `'blocked'` 结束（而不是假装成功），由调用方提示用户。
+ */
+export async function deleteDatabase(): Promise<'success' | 'blocked' | 'error'> {
   const db = await idb().catch(() => null)
   db?.close()
   _dbP = null
-  return new Promise<void>(res => {
+  return new Promise(resolve => {
     const deletion = indexedDB.deleteDatabase('novel-reader')
-    deletion.onblocked = () => res()
-    deletion.onsuccess = () => res()
-    deletion.onerror = () => res()
+    deletion.onblocked = () => resolve('blocked')
+    deletion.onsuccess = () => resolve('success')
+    deletion.onerror = () => resolve('error')
   })
 }
 

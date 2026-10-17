@@ -1,0 +1,215 @@
+{
+  "pageSwitch": [
+    {
+      "t": 0,
+      "lib": {
+        "o": "0.960729",
+        "tf": "matrix(0.99947, 0, 0, 0.99947, 0, 1.05931)",
+        "d": "block"
+      },
+      "home": {
+        "o": "0.0392712",
+        "tf": "matrix(0.996353, 0, 0, 0.996353, 0, -7.29379)",
+        "d": "block"
+      }
+    },
+    {
+      "t": 1,
+      "lib": {
+        "o": "1",
+        "tf": "matrix(0.999995, 0, 0, 0.999995, 0, 0.0108763)",
+        "d": "block"
+      },
+      "home": {
+        "o": "0",
+        "tf": "matrix(0.996004, 0, 0, 0.996004, 0, -7.99275)",
+        "d": "block"
+      }
+    },
+    {
+      "t": 2,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    },
+    {
+      "t": 3,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    },
+    {
+      "t": 4,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    },
+    {
+      "t": 5,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    },
+    {
+      "t": 6,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    },
+    {
+      "t": 7,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    },
+    {
+      "t": 8,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    },
+    {
+      "t": 9,
+      "lib": {
+        "o": "1",
+        "tf": "none",
+        "d": "block"
+      },
+      "home": {
+        "o": "1",
+        "tf": "none",
+        "d": "none"
+      }
+    }
+  ],
+  "button": {
+    "transitionProperty": "transform, opacity, background-color, border-color, color, box-shadow",
+    "transitionDuration": "0.14s, 0.22s, 0.22s, 0.22s, 0.22s, 0.22s",
+    "transitionTimingFunction": "cubic-bezier(0.34, 1.28, 0.52, 1), cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1)",
+    "animationName": "none",
+    "animationDuration": "0s",
+    "transform": "none",
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible"
+  },
+  "segButton": {
+    "transitionProperty": "color, background-color, opacity",
+    "transitionDuration": "0.22s, 0.22s, 0.22s",
+    "transitionTimingFunction": "cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1)",
+    "animationName": "none",
+    "animationDuration": "0s",
+    "transform": "none",
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible"
+  },
+  "card": {
+    "transitionProperty": "transform, opacity",
+    "transitionDuration": "0.34s, 0.34s",
+    "transitionTimingFunction": "cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1)",
+    "animationName": "none",
+    "animationDuration": "0s",
+    "transform": "none",
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible"
+  },
+  "header": {
+    "transitionProperty": "max-height, padding, opacity, transform",
+    "transitionDuration": "0.46s, 0.46s, 0.22s, 0.46s",
+    "transitionTimingFunction": "cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1)",
+    "animationName": "none",
+    "animationDuration": "0s",
+    "transform": "none",
+    "opacity": "1",
+    "display": "flex",
+    "visibility": "visible"
+  },
+  "coverHover": {
+    "before": "none",
+    "after": "none"
+  },
+  "pop": {
+    "transitionProperty": "transform, opacity, visibility",
+    "transitionDuration": "0.34s, 0.22s, 0s",
+    "transitionTimingFunction": "cubic-bezier(0.34, 1.28, 0.52, 1), cubic-bezier(0.32, 0.72, 0, 1), ease",
+    "animationName": "popIn",
+    "animationDuration": "0.34s",
+    "transform": "none",
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible"
+  },
+  "modal": {
+    "transitionProperty": "opacity, visibility",
+    "transitionDuration": "0.34s, 0s",
+    "transitionTimingFunction": "cubic-bezier(0.32, 0.72, 0, 1), ease",
+    "animationName": "none",
+    "animationDuration": "0s",
+    "transform": "none",
+    "opacity": "1",
+    "display": "flex",
+    "visibility": "visible"
+  },
+  "modalBox": {
+    "transitionProperty": "transform, opacity",
+    "transitionDuration": "0.46s, 0.34s",
+    "transitionTimingFunction": "cubic-bezier(0.32, 0.72, 0, 1), cubic-bezier(0.32, 0.72, 0, 1)",
+    "animationName": "overlayIn",
+    "animationDuration": "0.46s",
+    "transform": "none",
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible"
+  }
+}

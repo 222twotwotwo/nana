@@ -21,11 +21,23 @@ function setup({find=async()=>null,play=async()=>({data:{stream:'https://example
     removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);},
     emit:name=>listeners.get(name)?.()
   };
+  // ArtPlayer 替身：页面把播放器挂到容器 ref（setMount）上，再通过 art.on('video:xxx') 订阅事件。
+  // 这里把 art 的事件映射回 video 的监听表，测试即可照旧 video.emit('loadedmetadata')。
+  const mount={id:'animePlayerMount'};
+  let art=null;
+  function FakeArtPlayer(options){
+    this.options=options;this.video=video;this.handlers=new Map();
+    this.on=(name,fn)=>{this.handlers.set(name,fn);listeners.set(name.replace(/^video:/,''),fn);};
+    this.off=(name,fn)=>{if(this.handlers.get(name)===fn){this.handlers.delete(name);listeners.delete(name.replace(/^video:/,''));}};
+    this.destroy=()=>{};
+    art=this;
+  }
   const modules={
-    vue:{defineComponent:x=>x,ref:value=>({value}),computed:get=>({get value(){return get();}}),watch(){},onBeforeUnmount(){},nextTick:async()=>page.setVideo(video)},
+    vue:{defineComponent:x=>x,ref:value=>({value}),computed:get=>({get value(){return get();}}),watch(){},onBeforeUnmount(){},nextTick:async()=>page.setMount(mount)},
     '../../stores/app':{useAppStore:()=>app},
     '../../stores/search':{useSearchStore:()=>({})},
     '../../services/anime':{animeState:state,bumpAnimeRequest:()=>++request,currentAnimeRequest:()=>request,registerAnimeStop(){},episodeKey:title=>title,
+      loadArtplayer:async()=>FakeArtPlayer,loadHls:async()=>({isSupported:()=>false,Events:{ERROR:'hlsError'}}),
       findAlternativeAnime:(...args)=>{queries.push(args);return find(...args);}},
     '../../services/server':{SOURCES:{value:['original','first','second'].map(id=>({id,name:id,type:'anime'}))},sourceId:id=>id,
       api:(url,body)=>{plays.push(body);return play(body);}},
@@ -36,7 +48,7 @@ function setup({find=async()=>null,play=async()=>({data:{stream:'https://example
   const context={exports:{},setTimeout:()=>1,clearTimeout(){},require:id=>{if(!modules[id])throw new Error('unexpected module '+id);return modules[id];}};
   vm.runInNewContext(code,context);
   page=context.exports.default.setup({}, {expose(){}});
-  return {page,state,app,video,queries,plays,saved,progress};
+  return {page,state,app,video,queries,plays,saved,progress,getArt:()=>art};
 }
 
 test('手动失败仅尝试同源线路，切回自动后才允许跨源',async()=>{

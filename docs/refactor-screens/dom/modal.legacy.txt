@@ -1,0 +1,16 @@
+div#storeModal
+  div.sm-box
+    button#smClose.sm-close :: ✕
+    div.sm-head
+      div.cover.cv-placeholder :: 雾海行舟（示例）
+      div.grow
+        div.sm-title :: 雾海行舟（示例）
+        div.sm-meta :: 小说 · 本地收藏
+        div.sm-meta :: 测试作者 · 3 章
+    p.sm-intro :: 暂无简介
+    div.row
+      button#smRead.btn.primary :: 继续阅读
+      button#smSave.btn :: 已收藏
+      button#smRemove.btn.danger :: 移出收藏
+    p.muted.detail-note :: 开始阅读后自动加入收藏，方便下次继续。正文按需缓存。
+    div#smProgress

@@ -1,0 +1,59 @@
+section#page-home.page
+  div#homeBox.page-inner
+    div.home-heading
+      h1.big-title :: 主页
+    div#homeSearch
+      form#storeBar
+        input#storeKw [搜索书名、作者或关键词，例如：剑来]
+        button#btnStoreSearch.btn.primary :: 搜索
+        button#closeSearch.btn :: 取消
+      div#storeStatus.muted :: 同时搜索 6 个小说来源
+      div#storeErrors.muted
+      div#storeGrid.book-grid
+        p.muted.store-empty :: 搜索喜欢的小说，打开详情后可阅读或加入收藏。
+    div#homeOverview.hidden
+      div#homeContinue
+        h2.sec-title :: 继续阅读
+        div.home-resume
+          div.cover.cv-placeholder :: 雾海行舟（示例）
+          div.resume-copy
+            h3 :: 雾海行舟（示例）
+            p.muted :: 测试作者
+            p.resume-progress :: 第 1 章 · 0%
+            div.resume-actions
+              button#homeResume.btn :: 继续阅读
+              button#homeCine.btn :: 情境配乐 ♪
+      div#homeRecent
+        div.section-heading
+          h2.sec-title :: 最近收藏
+        div.home-wall
+          div.bk.sr.catalog-card.saved
+            button.catalog-open
+              div.cover.cv-placeholder :: 雾海行舟（示例）
+              div.catalog-copy
+                div.sr-name :: 雾海行舟（示例）
+                div.sr-meta :: 测试作者
+                div.sr-source :: 本地收藏
+            div.bc-foot
+              span :: 0%
+              button.bc-more :: ⋯
+          div.bk.sr.catalog-card.saved
+            button.catalog-open
+              div.cover.cv-placeholder :: 夜雨
+              div.catalog-copy
+                div.sr-name :: 夜雨
+                div.sr-meta :: 音乐
+                div.sr-source :: 本地音乐
+            div.bc-foot
+              span :: 未播放
+              button.bc-more :: ⋯
+          div.bk.sr.catalog-card.saved
+            button.catalog-open
+              div.cover.cv-placeholder :: 第二本书·山海拾遗
+              div.catalog-copy
+                div.sr-name :: 第二本书·山海拾遗
+                div.sr-meta :: 另一位作者
+                div.sr-source :: 本地收藏
+            div.bc-foot
+              span :: 未阅读
+              button.bc-more :: ⋯

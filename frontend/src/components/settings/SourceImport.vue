@@ -57,8 +57,8 @@ async function removeSource(source: SourceMeta) {
 
 <template>
   <div class="card" id="customSources">
-    <b>导入番剧源</b>
-    <p class="muted">支持 Kazumi JSON 文件，可包含一个源或源数组，每次最多 100 个、1 MB。导入后立即生效，重启后保留。</p>
+    <h2 class="card-title">导入番剧源</h2>
+    <p class="muted card-description">支持 Kazumi JSON 文件，可包含一个源或源数组，每次最多 100 个、1 MB。导入后立即生效，重启后保留。</p>
     <button class="btn primary" :disabled="busy" @click="sourceFile?.click()">选择 JSON 文件</button>
     <input ref="sourceFile" id="sourceFile" type="file" accept=".json,application/json" class="hidden" :disabled="busy" @change="onFile">
     <details class="source-paste">
@@ -81,9 +81,9 @@ async function removeSource(source: SourceMeta) {
 </template>
 
 <style scoped>
-.source-paste { margin-top: 16px; }
+.source-paste { margin: 16px 0; }
 .source-paste summary { cursor: pointer; }
 textarea { display: block; width: 100%; box-sizing: border-box; resize: vertical; padding: 12px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); font: inherit; }
 .source-address, .import-result { overflow-wrap: anywhere; }
-.import-error { color: #b13a2b; }
+.import-error { color: var(--danger); }
 </style>

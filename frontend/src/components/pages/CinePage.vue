@@ -8,6 +8,7 @@ import { analyzeChapter } from '../../services/llm'
 import { clamp, sleep } from '../../utils'
 import { EMOTIONS, EMO_LABELS } from '../../constants'
 import type { BookRecord, AnalysisRecord } from '../../types'
+import AppIcon from '../common/AppIcon.vue'
 
 const app = useAppStore()
 const lib = useLibStore()
@@ -166,19 +167,20 @@ function onNodeChange(i: number) {
 <template>
   <section id="page-cine" class="page">
     <div class="page-inner" id="cineBox">
-      <template v-if="!books.length">
+      <div class="page-heading">
         <h1 class="big-title">情境配乐</h1>
-        <p class="muted">库墙为空，请先导入小说（漫画暂不支持情绪分析）</p>
+        <p class="muted">预设章节情绪与曲目，让配乐随阅读自然切换。</p>
+      </div>
+      <template v-if="!books.length">
+        <div class="card"><p class="muted">库墙为空，请先导入小说（漫画暂不支持情绪分析）</p></div>
       </template>
       <template v-else>
-        <h1 class="big-title">情境配乐</h1>
-        <p class="muted" style="margin:-14px 0 18px">AI 预分析每章情绪节点（可手动编辑），再把情绪绑定到曲目——阅读时自动渐入渐出切换</p>
-        <div class="row" style="margin-bottom:14px">
-          <select class="sel" id="cineBookSel" style="max-width:280px" :value="cineBookId" @change="onBookChange">
+        <div class="row cine-toolbar">
+          <select class="sel" id="cineBookSel" aria-label="选择小说" :value="cineBookId" @change="onBookChange">
             <option v-for="b in books" :key="b.id" :value="b.id">《{{ b.title }}》</option>
           </select>
-          <button class="btn primary" id="btnBatch" @click="onBatch">⚡ 批量分析未分析章节</button>
-          <span class="muted" id="batchInfo">{{ batchInfo }}</span>
+          <button class="btn primary" id="btnBatch" @click="onBatch"><AppIcon name="sparkles" />批量分析未分析章节</button>
+          <span class="muted" id="batchInfo" role="status">{{ batchInfo }}</span>
         </div>
         <div id="chCards">
           <div v-for="(ch, i) in currentBook()?.chapters || []" :key="i" class="card ch-card">
@@ -187,29 +189,29 @@ function onNodeChange(i: number) {
               <b class="grow">{{ ch.title }}</b>
               <span class="st" :class="{ done: !!analysisFor(i) }">{{ analysisFor(i) ? analysisFor(i)!.nodes.length + ' 个情绪节点' : '未分析' }}</span>
               <button class="btn small" @click="onAnalyze(i, $event.target as HTMLButtonElement)">{{ analysisFor(i) ? '重新分析' : 'AI 分析' }}</button>
-              <button class="btn small" @click="toggleFold(i)">{{ analysisFor(i) ? '编辑' : '手动添加' }}</button>
+              <button class="btn small" :aria-expanded="!!folds[cineBookId + ':' + i]" @click="toggleFold(i)">{{ analysisFor(i) ? '编辑' : '手动添加' }}</button>
             </div>
             <div v-if="folds[cineBookId + ':' + i] && cardNodes[i]" class="nodes">
               <div v-for="(n, k) in cardNodes[i]" :key="k" class="node-row">
-                <span class="muted">at%</span>
-                <input type="number" class="n-at" min="0" max="100" v-model.number="n.at" @change="onNodeChange(i)">
-                <select class="n-em" v-model="n.emotion" @change="onNodeChange(i)">
+                <span class="muted">进度 %</span>
+                <input type="number" class="n-at" aria-label="情绪出现位置（百分比）" min="0" max="100" v-model.number="n.at" @change="onNodeChange(i)">
+                <select class="n-em" aria-label="情绪" v-model="n.emotion" @change="onNodeChange(i)">
                   <option v-for="e in EMOTIONS" :key="e.label" :value="e.label">{{ e.label }}</option>
                   <option v-if="!EMO_LABELS.includes(n.emotion)" :value="n.emotion">{{ n.emotion }}</option>
                 </select>
-                <input type="text" class="n-note" v-model="n.note" placeholder="情绪说明（可空）" @change="onNodeChange(i)">
-                <button class="btn small danger" @click="delNode(i, k)">✕</button>
+                <input type="text" class="n-note" aria-label="情绪说明" v-model="n.note" placeholder="情绪说明（可空）" @change="onNodeChange(i)">
+                <button class="btn small danger icon-button" aria-label="删除节点" @click="delNode(i, k)"><AppIcon name="close" /></button>
               </div>
               <div class="row">
-                <button class="btn small" @click="addNode(i)">＋ 添加节点</button>
-                <span class="muted">at 为情绪出现位置（章节进度 0-100%），修改即时保存</span>
+                <button class="btn small" @click="addNode(i)"><AppIcon name="plus" />添加节点</button>
+                <span class="muted">进度为情绪出现位置（章节进度 0–100%），修改即时保存</span>
               </div>
             </div>
           </div>
         </div>
         <div class="card">
           <div class="row" style="margin-bottom:6px">
-            <b style="letter-spacing:2px">情绪 → 曲目映射</b>
+            <h2 class="card-title">情绪与曲目</h2>
             <span class="muted">阅读时按此表选曲</span>
             <div class="grow" />
             <button class="btn small" id="btnAutoMap" @click="onAutoMap">按曲目标签自动映射</button>
@@ -218,7 +220,7 @@ function onNodeChange(i: number) {
             <div v-for="e in EMOTIONS" :key="e.label" class="map-row">
               <span class="dot" :style="{ background: e.color }" />
               <b style="min-width:3em">{{ e.label }}</b>
-              <select :value="mapping[e.label] || ''" @change="onMapChange(e.label, $event)">
+              <select :aria-label="`${e.label}对应曲目`" :value="mapping[e.label] || ''" @change="onMapChange(e.label, $event)">
                 <option value="">（未绑定）</option>
                 <option v-for="mm in musics" :key="mm.id" :value="mm.id">{{ mm.name }}</option>
               </select>

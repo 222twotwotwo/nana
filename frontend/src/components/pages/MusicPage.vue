@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppIcon from '../common/AppIcon.vue'
 import { computed, ref, watch } from 'vue'
 import { useAppStore } from '../../stores/app'
 import { useSearchStore } from '../../stores/search'
@@ -8,7 +9,7 @@ import { player } from '../../services/audio'
 import { musicState, startMusic, neighborMusic } from '../../services/music'
 import { dbAll, dbPut } from '../../services/idb'
 import { getProgress, settings, saveMediaProgress } from '../../services/settings'
-import { hashHue, fmtTime } from '../../utils'
+import { fmtTime } from '../../utils'
 import { EMOTIONS, emoColor } from '../../constants'
 import type { MusicRecord } from '../../types'
 
@@ -28,7 +29,6 @@ const m = computed(() => player.currentMusic || musicState.muSelected)
 const playing = computed(() => { tick.value; return player.isPlaying() })
 const emo = computed(() => reader.ambOn && reader.playingEmotion ? reader.playingEmotion : (m.value?.tags?.[0] || ''))
 
-const hue = computed(() => hashHue(m.value ? m.value.name : 'nana'))
 const title = computed(() => reader.playingEmotion && reader.ambOn ? `情境 · ${reader.playingEmotion}` : '音 乐')
 const coverText = computed(() => m.value ? `${m.value.name.slice(0, 4)}<small>NANA</small>` : '♪')
 const emoText = computed(() => {
@@ -138,7 +138,7 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
 </script>
 
 <template>
-  <section id="page-music" class="page" :style="{ '--mu-hue': String(hue) }">
+  <section id="page-music" class="page">
     <button class="float-back" title="返回库墙" aria-label="返回库墙" @click="search.openCategory('music', 'library')">
       <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
     </button>
@@ -147,7 +147,7 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
       <div class="mu-top">
         <span class="mu-spacer" />
         <div id="muTitle">{{ title }}</div>
-        <button id="muReplay" title="从头播放" @click="onReplay">↻</button>
+        <button id="muReplay" title="从头播放" aria-label="从头播放" @click="onReplay"><AppIcon name="replay" /></button>
       </div>
       <div class="mu-stage">
         <div class="vinyl-box">
@@ -169,8 +169,8 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
       <div class="mu-panel">
         <h2 id="muName" ref="muNameEl">{{ nameText }}</h2>
         <div class="mu-meta">
-          <span id="muEmo" class="badge" :style="{ background: emoBg }">{{ emoText }}</span>
-          <span id="muState" style="opacity:.65">{{ stateText }}</span>
+          <span id="muEmo" class="badge" :style="{ '--emotion-color': emoBg }">{{ emoText }}</span>
+          <span id="muState">{{ stateText }}</span>
         </div>
         <div class="mu-prog">
           <span id="muCur">{{ cur }}</span>
@@ -180,23 +180,23 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
         </div>
         <div class="mu-note" id="muNote">{{ noteText }}</div>
         <div class="mu-ctrl">
-          <button id="muShuffle" title="随机播放" @click="onShuffle">🔀</button>
-          <button id="muPrev" title="上一首" @click="onPrev">⏮</button>
-          <button id="muPlay" title="播放/暂停" @click="onPlay">{{ playing ? '⏸' : '▶' }}</button>
-          <button id="muNext" title="下一首" @click="onNext">⏭</button>
-          <button id="muListBtn" title="查找音乐" @click="drawerEl?.scrollIntoView({ block: 'start' })">☰</button>
+          <button id="muShuffle" title="随机播放" aria-label="随机播放" @click="onShuffle"><AppIcon name="shuffle" /></button>
+          <button id="muPrev" title="上一首" aria-label="上一首" @click="onPrev"><AppIcon name="previous" /></button>
+          <button id="muPlay" :title="playing ? '暂停' : '播放'" :aria-label="playing ? '暂停' : '播放'" @click="onPlay"><AppIcon :name="playing ? 'pause' : 'play'" /></button>
+          <button id="muNext" title="下一首" aria-label="下一首" @click="onNext"><AppIcon name="next" /></button>
+          <button id="muListBtn" title="查找音乐" aria-label="查找音乐" @click="drawerEl?.scrollIntoView({ block: 'start' })"><AppIcon name="list" /></button>
         </div>
       </div>
       <div class="mu-foot">
-        <button id="mfTheme" title="明暗主题" @click="app.toggleTheme()">☾</button>
-        <button id="mfInfo" title="说明" @click="app.toast('阅读时滚到情绪节点，音乐会渐入渐出切换 · 在「情境配乐」页预设')">ⓘ</button>
-        <button id="mfMore" title="更多">⋯</button>
+        <button id="mfTheme" title="明暗主题" :aria-label="settings.theme === 'dark' ? '切换浅色主题' : '切换深色主题'" @click="app.toggleTheme()"><AppIcon :name="settings.theme === 'dark' ? 'sun' : 'moon'" /></button>
+        <button id="mfInfo" title="说明" aria-label="配乐说明" @click="app.toast('阅读时滚到情绪节点，音乐会渐入渐出切换 · 在「情境配乐」页预设')"><AppIcon name="info" /></button>
+        <button id="mfMore" title="更多" aria-label="更多"><AppIcon name="more" /></button>
       </div>
     </div>
     <div id="muDrawer" ref="drawerEl">
       <div class="row">
         <h3 class="grow">播放列表 <span id="musicCount">{{ musics.length }}</span></h3>
-        <button class="btn small" id="muDrawerClose" title="回到播放器" @click="muNameEl?.scrollIntoView({ block: 'center' })">↑</button>
+        <button class="btn small icon-button" id="muDrawerClose" title="回到播放器" aria-label="回到播放器" @click="muNameEl?.scrollIntoView({ block: 'center' })"><AppIcon name="up" /></button>
       </div>
       <p class="muted">曲目标签可用于阅读时的情境配乐。</p>
       <div class="row music-player-links">
@@ -210,18 +210,19 @@ setInterval(() => { if (app.page === 'music') tick.value++ }, 400)
         <p v-if="!musics.length" class="music-empty muted">还没有曲目。到「发现音乐」搜索并添加，或上传本地音频文件。</p>
         <div v-for="row in musics" :key="row.id" class="music-row">
           <button class="m-play" :class="{ cur: player.currentMusic && player.currentMusic.id === row.id }"
-            @click="onRowPlay(row)">{{ player.currentMusic && player.currentMusic.id === row.id && playing ? '⏸' : '▶' }}</button>
+            :aria-label="`${player.currentMusic?.id === row.id && playing ? '暂停' : '播放'} ${row.name}`"
+            @click="onRowPlay(row)"><AppIcon :name="player.currentMusic?.id === row.id && playing ? 'pause' : 'play'" /></button>
           <div class="grow" style="min-width:0">
             <div class="music-name" :class="{ now: player.currentMusic && player.currentMusic.id === row.id }">{{ row.name }}</div>
             <div class="muted">{{ row.sourceName || '本地音乐' }}{{ row.preview ? ' · 试听片段' : '' }}{{ row.duration ? ' · ' + fmtTime(row.duration) : '' }}{{ row.author ? ' · ' + row.author : '' }}</div>
           </div>
           <div class="chips">
-            <span v-for="e in EMOTIONS" :key="e.label" class="chip"
+            <button v-for="e in EMOTIONS" :key="e.label" class="chip"
               :class="{ on: (row.tags || []).includes(e.label) }"
-              :style="(row.tags || []).includes(e.label) ? { background: e.color } : {}"
-              @click="toggleTag(row, e.label)">{{ e.label }}</span>
+              :aria-pressed="(row.tags || []).includes(e.label)"
+              @click="toggleTag(row, e.label)">{{ e.label }}</button>
           </div>
-          <button class="btn small danger" @click="onRemove(row)">✕</button>
+          <button class="btn small danger icon-button" :aria-label="`移除 ${row.name}`" @click="onRemove(row)"><AppIcon name="close" /></button>
         </div>
       </div>
     </div>

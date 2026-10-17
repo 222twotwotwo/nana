@@ -3,13 +3,12 @@ import { computed, ref } from 'vue'
 import { useAppStore } from '../../stores/app'
 import { useSearchStore } from '../../stores/search'
 import { useLibStore } from '../../stores/lib'
-import { useReaderStore } from '../../stores/reader'
 import { settings } from '../../services/settings'
 import { player } from '../../services/audio'
+import { useSlidingPill } from '../../composables/useSlidingPill'
 
 const app = useAppStore()
 const search = useSearchStore()
-const reader = useReaderStore()
 
 // 原版 renderStore：发现模式时搜索项高亮
 const navOn = (nav: string) => {
@@ -18,6 +17,12 @@ const navOn = (nav: string) => {
 }
 
 const viewModeBtn = computed(() => settings.viewMode === 'grid' ? '☰' : '▦')
+
+/* 分段控件滑动高亮：激活项由 app.page / search.discover 决定，故传入数据来源。
+   解构成顶层变量，模板里的字符串 ref 才能绑定到它。 */
+const segRef = ref<HTMLElement | null>(null)
+const { pill: segPill, pillClass: segPillClass, pillActiveClass, sliding } = useSlidingPill(
+  segRef, '.on', 'seg-pill', () => [app.page, search.discover] as const)
 
 function onNav(e: MouseEvent) {
   const b = (e.target as HTMLElement).closest('button[data-nav]') as HTMLElement | null
@@ -53,7 +58,8 @@ const moreBtn = ref<HTMLElement | null>(null)
 
 <template>
   <header id="chrome">
-    <div class="seg" id="mainSeg" @click="onNav">
+    <div class="seg" id="mainSeg" ref="segRef" :class="{ [pillActiveClass]: sliding }" @click="onNav">
+      <span :class="segPillClass" ref="segPill" aria-hidden="true" />
       <button data-nav="home" :class="{ on: navOn('home') }">主页</button>
       <button data-nav="library" :class="{ on: navOn('library') }">库墙</button>
       <button data-nav="search" :class="{ on: navOn('search') }" aria-label="搜索" title="搜索">

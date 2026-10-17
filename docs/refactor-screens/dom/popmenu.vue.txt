@@ -1,0 +1,7 @@
+div.pop
+  button :: ♪  音乐播放器
+  button :: 🎼 情境配乐
+  button :: ⚙ 设置
+  div.sep
+  button :: ＋ 导入 txt 小说
+  button :: ☾ 深色模式

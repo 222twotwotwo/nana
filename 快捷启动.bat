@@ -11,7 +11,8 @@ exit /b %MOYIN_EXIT%
 $ErrorActionPreference = 'Stop'
 try {
     $entry = Join-Path $env:MOYIN_ROOT 'server\index.js'
-    $pattern = '(?:^|\s)"?' + [regex]::Escape($entry) + '"?(?:\s|$)'
+    # 兼容从项目目录以相对路径启动的旧服务（例如：node server/index.js）。
+    $pattern = '(?i)(?:^|\s)"?(?:' + [regex]::Escape($entry) + '|server[\\/]index\.js)' + '"?(?:\s|$)'
     $existing = Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" |
         Where-Object { $_.CommandLine -match $pattern } | Select-Object -First 1
     if ($existing) {

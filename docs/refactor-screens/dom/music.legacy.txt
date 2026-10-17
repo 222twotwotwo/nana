@@ -1,0 +1,65 @@
+section#page-music.page
+  div#muBg
+  div.mu-inner
+    div.mu-top
+      button#muBack :: ⌄
+      div#muTitle :: 音 乐
+      button#muReplay :: ↻
+    div.mu-stage
+      div.vinyl-box
+        div#disc.paused
+          div#muCover :: 夜雨
+            small :: MOOIN
+        svg#tonearm
+          circle
+          circle
+          rect
+          rect
+      div#muLyric.mu-lyric :: 让音乐陪你读下去
+    div.mu-panel
+      h2#muName :: 夜雨
+      div.mu-meta
+        span#muEmo.badge :: 平静
+        span#muState :: 音频加载失败，请重试或打开原站
+      div.mu-prog
+        span#muCur :: 0:00
+        input#muSeek [0]
+        span#muDur :: 0:00
+      div#muNote.mu-note :: 自由聆听模式
+      div.mu-ctrl
+        button#muShuffle :: 🔀
+        button#muPrev :: ⏮
+        button#muPlay :: ▶
+        button#muNext :: ⏭
+        button#muListBtn :: ☰
+    div.mu-foot
+      button#mfTheme :: ☾
+      button#mfInfo :: ⓘ
+      button#mfMore :: ⋯
+  div#muDrawer
+    div.row
+      h3.grow :: 播放列表
+        span#musicCount :: 1
+      button#muDrawerClose.btn.small :: ↑
+    p.muted :: 曲目标签可用于阅读时的情境配乐。
+    div.row.music-player-links
+      button#musicDiscover.btn.small :: 发现音乐
+      button#musicCollection.btn.small :: 管理收藏
+    label.fld :: 音量
+    input#muVol [75]
+    div#musicList
+      div.music-row
+        button.m-play :: ▶
+        div.grow
+          div.music-name :: 夜雨
+          div.muted :: 本地音乐 · 0:45
+        div.chips
+          span.chip.on :: 平静
+          span.chip :: 温馨
+          span.chip :: 悲伤
+          span.chip :: 紧张
+          span.chip :: 激昂
+          span.chip :: 诡异
+          span.chip :: 欢快
+          span.chip :: 史诗
+        button.btn.small.danger :: ✕

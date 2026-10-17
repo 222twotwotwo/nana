@@ -20,6 +20,11 @@ class Player {
   get volume() { return settings.volume }
 
   on(f: Listener) { this.listeners.push(f) }
+  /** 注销监听：悬浮播放器等组件卸载时必须调用，否则热更新会重复累积 */
+  off(f: Listener) {
+    const i = this.listeners.indexOf(f)
+    if (i >= 0) this.listeners.splice(i, 1)
+  }
   emit() { this.listeners.forEach(f => { try { f() } catch { /* noop */ } }) }
 
   ensureCtx() {

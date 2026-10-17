@@ -11,7 +11,9 @@ export const useAppStore = defineStore('app', {
     toastMsg: '',
     toastShow: false,
     pop: null as { anchor: HTMLElement; items: PopItem[] } | null,
-    cineBookId: ''
+    cineBookId: '',
+    /** 主题切换计数器：App.vue 监听它以挂上一次性颜色过渡 */
+    themeTick: 0
   }),
   actions: {
     toast(msg: string) {
@@ -26,6 +28,7 @@ export const useAppStore = defineStore('app', {
     closePop() { this.pop = null },
     toggleTheme() {
       saveSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })
+      this.themeTick++
     },
     showPage(page: PageId) {
       const search = useSearchStore()

@@ -1,0 +1,222 @@
+div#settingsBox.page-inner
+  h1.big-title :: 设置
+  p.muted :: 填写任意 OpenAI 兼容接口（DeepSeek / Kimi / 通义 / 本地 Ollama…），用于预分析小说情绪
+  div.card
+    label.fld :: API 地址（Base URL，自动拼接 /chat/completions）
+    input#setBase [例如 https://api.deepseek.com/v1 或 http://localhost:11434/v1]
+    label.fld :: API Key（可留空，本地服务无需）
+    input#setKey [sk-...]
+    label.fld :: 模型名
+    input#setModel [例如 deepseek-chat / gpt-4o-mini / qwen2.5:7b]
+    div.row
+      button#btnTest.btn.primary :: 测试连接
+      span#testInfo.muted
+  div.card
+    b :: 内容来源 · 连接状态
+    p.muted :: 检测包含搜索、目录、样本正文和漫画首尾图片下载。结果只代表检测时的样本。
+    div#sourceHealth
+      div.source-row
+        div :: · 检测已过期
+          b :: 酷我小说
+          p.muted :: 中文小说 · 公开接口，部分作品可能不可读
+          p.muted :: 2026/10/5 22:36:56 · 剑神重生 / 3193 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 阅友小说
+          p.muted :: 中文小说 · 公开章节，付费章节不会解锁
+          p.muted :: 2026/10/5 22:36:57 · 剑帝 / 6980 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 速读谷
+          p.muted :: 中文网文 · 搜索至少两个汉字 · 自动合并目录和正文分页
+          p.muted :: 2026/10/5 22:36:59 · 剑来 / 1301 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 笔趣阁365
+          p.muted :: 中文网文 · 需要代理 · 搜索显示前 100 项，建议输入完整书名
+          p.muted :: 2026/10/5 22:37:01 · 剑来：小镇签到十年，截胡宁姚 / 53 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 维基文库
+          p.muted :: 中文经典文学、古籍 · 需要代理 · 依原文版本保留简繁体
+          p.muted :: 2026/10/5 22:37:03 · 三國演義 / 123 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 轻小说文库
+          p.muted :: 中文轻小说文库 · OPDS 搜索与公开 TXT 章节 · 作品版权和更新状态以源站为准
+          p.muted :: 2026/10/5 23:34:52 · 刀剑神域(SAO／ALO／GGO／UW) / 234 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 网易云音乐
+          p.muted :: 中外歌曲 · 官方公开播放接口 · 受限曲目请在原站收听，试听片段会单独标注
+          p.muted :: 2026/10/6 10:12:21 · 起风了 / 音频已读取 4096 字节
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 好听轻音乐
+          p.muted :: 纯音乐、钢琴与影视配乐 · 站点公开 MP3 · 可直连
+          p.muted :: 2026/10/6 10:12:21 · 天空之城 (小提琴) / 音频已读取 4096 字节
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: Internet Archive 音频
+          p.muted :: 公开音频元数据与直接音频文件 · 以授权和源站标注为准 · 需要代理
+          p.muted :: 2026/10/6 10:12:22 · Ambient Wave 48 (Tribute) / 音频已读取 4096 字节
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: Wikimedia Commons 音频
+          p.muted :: 维基共享资源公开音频 · 以文件页授权标注为准 · 需要代理
+          p.muted :: 2026/10/6 10:12:52 · 3-parts Invention No. 8 (F major) in piano-girl Jia Xin's view.ogg / 音频已读取 4096 字节
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 漫画人
+          p.muted :: 中文漫画 · 公开章节；与另一漫画源可能共享资源
+          p.muted :: 2026/10/5 22:37:06 · 剑魂 / 63 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 极速漫画
+          p.muted :: 中文漫画 · 公开章节；与另一漫画源可能共享资源
+          p.muted :: 2026/10/5 22:37:07 · 剑魂 / 63 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 快看漫画
+          p.muted :: 国漫、韩漫 · 官方公开章节，付费及下架作品可能不可读
+          p.muted :: 2026/10/5 22:37:12 · 拔剑九亿次 / 13 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: WEBTOON 繁体中文
+          p.muted :: 繁体中文漫画 · 需要代理 · 仅网页公开话数，部分作品需官方 App
+          p.muted :: 2026/10/5 22:37:14 · 廢皇子的神祕愛人 / 7 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: MangaDex 中文
+          p.muted :: 简体／繁体译本 · 仅中文章节，部分作品中文更新不齐全 · 搜索最多 100 项
+          p.muted :: 2026/10/5 22:37:18 · 剑豪生死斗 / 85 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: 7sefun
+          p.muted :: Kazumi 番剧源 · 公开搜索、目录与播放地址
+          p.muted :: 2026/10/6 12:59:57 · 火影忍者 / 1440 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: DM84
+          p.muted :: Kazumi 番剧源 · 动漫巴士公开搜索、目录与播放地址
+          p.muted :: 2026/10/6 13:08:51 · 火影忍者 / 2018 章
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测失败
+          b :: aafun
+          p.muted :: KazumiRules aafun · 自动适配公开搜索、目录与播放地址
+          p.muted :: 2026/10/13 12:27:53 · content：地址不属于该书源
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: AGE
+          p.muted :: KazumiRules AGE · 自动适配公开搜索、目录与播放地址
+          p.muted :: 2026/10/6 13:07:14 · detail：源站连接失败：UND_ERR_CONNECT_TIMEOUT
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: akianime
+          p.muted :: KazumiRules akianime · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: baimao
+          p.muted :: KazumiRules baimao · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: dalvdm
+          p.muted :: KazumiRules dalvdm · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: ezdmw
+          p.muted :: KazumiRules ezdmw · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: giriGiriLove
+          p.muted :: KazumiRules giriGiriLove · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: mgnacg
+          p.muted :: KazumiRules mgnacg · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: moonci
+          p.muted :: KazumiRules moonci · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: mutefun
+          p.muted :: KazumiRules mutefun · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: MXdm
+          p.muted :: KazumiRules MXdm · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: sorani
+          p.muted :: KazumiRules sorani · 自动适配公开搜索、目录与播放地址
+          p.muted :: 2026/10/6 13:07:26 · search：样本关键词无搜索结果
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 尚未检测
+          b :: xfdmneo
+          p.muted :: KazumiRules xfdmneo · 自动适配公开搜索、目录与播放地址
+          p.muted :: 点击检测确认当前网络可用性
+        button.btn.small :: 重新检测
+      div.source-row
+        div :: · 检测已过期
+          b :: xfdmnext
+          p.muted :: KazumiRules xfdmnext · 自动适配公开搜索、目录与播放地址
+          p.muted :: 2026/10/6 13:07:26 · search：样本关键词无搜索结果
+        button.btn.small :: 重新检测
+    p.muted :: 第三方来源仅供个人使用；登录、付费或下架内容可能无法打开。四类收藏和阅读、播放进度保存在当前浏览器，请通过固定地址访问。
+  div.card
+    label.fld :: 渐入渐出时长：秒
+      b#fadeVal :: 4
+    input#setFade [4]
+    label.fld :: 默认音量：
+      b#volVal :: 75%
+    input#setVol [75]
+  div.card
+    b :: 备份与迁移
+    p.muted :: 导出小说、漫画、音乐、番剧收藏，以及分析、进度与设置（不含 API Key）。可在另一浏览器或访问地址恢复。
+    div.row
+      button#exportBackup.btn :: 导出备份
+      button#importBackup.btn :: 恢复备份
+      input#backupFile.hidden []
+  div.card
+    div.row
+      button#btnWipe.btn.danger :: 清空所有数据
+      span.muted :: 删除全部书籍、音乐、分析与设置，不可恢复

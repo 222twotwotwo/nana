@@ -1,0 +1,26 @@
+section#page-reader.page
+  div#rdHead
+    span#rdHeadTitle :: 第一章 雾港启航
+      b :: 雾海行舟（示例）
+  div#readerScroll
+    article#chapterBody
+      h1 :: 第一章 雾港启航
+      div.ch-sub :: 《雾海行舟（示例）》 · 1/3
+      p :: 晨雾未散，青雀港像浸在一碗温开的牛奶里。
+      p :: 沈舟把最后一桶淡水搬上「逐光号」，直起腰，听见甲板下传来妹妹阿螺试笛的声音——断断续续，像溪水绕过石头。
+      p :: 「今天出港？」码头上，老舵手秦伯叼着旱烟，眯眼看天。
+      p :: 「今天。」沈舟说，「雾散之前。」
+      p :: 秦伯笑了笑，把烟锅在鞋底磕了磕：「雾海深处，看得清的人反而走得慢。你们这些急的，倒容易撞上运气。」
+      p :: 缆绳解开的时候，海面平静得像一块熨过的蓝布。逐光号缓缓离开泊位，惊起两三只白鹭。
+      div.rd-foot :: — 1 / 3 —
+      div.rd-nav
+        button.btn.small :: 下一章
+  aside#chDrawer
+    div.ch-item.cur :: 第一章 雾港启航
+    div.ch-item :: 第二章 风暴与低吟
+    div.ch-item :: 第三章 灯火归港
+  div#rdFab
+    div#rdMenu.hidden
+    div#fabBar
+      span#fabText :: 目录 · 0%
+      span.fb-ico :: ☰

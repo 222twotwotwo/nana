@@ -1,0 +1,40 @@
+section#page-library.page
+  div.page-inner
+    div.home-heading
+      h1.big-title :: 书库
+      div#libraryTypeSeg.category-tabs.compact
+        button.on :: 小说
+        button :: 漫画
+        button :: 音乐
+        button :: 番剧
+    input#fileImport.hidden []
+    input#fileMusic.hidden []
+    div#libraryAmbience.row.hidden
+      span.muted :: 合成氛围音：
+      button.btn.small :: 夜雨
+      button.btn.small :: 海浪
+      button.btn.small :: 低鸣
+    div#bookGrid.book-grid
+      button.library-add
+        span.cover
+          span :: ＋
+      div.bk.sr.catalog-card.saved
+        button.catalog-open
+          div.cover.cv-placeholder :: 雾海行舟（示例）
+          div.catalog-copy
+            div.sr-name :: 雾海行舟（示例）
+            div.sr-meta :: 测试作者
+            div.sr-source :: 本地收藏
+        div.bc-foot
+          span :: 0%
+          button.bc-more :: ⋯
+      div.bk.sr.catalog-card.saved
+        button.catalog-open
+          div.cover.cv-placeholder :: 第二本书·山海拾遗
+          div.catalog-copy
+            div.sr-name :: 第二本书·山海拾遗
+            div.sr-meta :: 另一位作者
+            div.sr-source :: 本地收藏
+        div.bc-foot
+          span :: 未阅读
+          button.bc-more :: ⋯

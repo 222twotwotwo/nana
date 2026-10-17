@@ -1,11 +1,27 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue'
+import AppIcon from '../common/AppIcon.vue'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useSearchStore } from '../../stores/search'
 import { CONTENT_TYPES } from '../../constants'
 import { fmtTime } from '../../utils'
 import CoverBlock from '../common/CoverBlock.vue'
 
 const search = useSearchStore()
+
+/**
+ * 作者 · 时长/章数 一行。
+ * 原版是模板字符串 `${author}${type==='music' ? (duration?' · '+t:'') : ` · ${n} ${part}`}`，
+ * 直接照搬拼接逻辑：若拆成相邻的插值 + <template>，Vue 会吃掉分隔符前的空格，
+ * 渲染成「测试作者· 3 章」而不是「测试作者 · 3 章」。
+ */
+const metaLine = computed(() => {
+  const m = search.modal
+  const author = m.det?.author || m.item?.author || ''
+  const tail = m.type === 'music'
+    ? (m.det?.duration ? ' · ' + fmtTime(m.det.duration) : '')
+    : ` · ${m.det?.chapters?.length ?? 0} ${CONTENT_TYPES[m.type].part}`
+  return author + tail
+})
 
 function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape') search.closeStoreModal()
@@ -15,10 +31,10 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 </script>
 
 <template>
-  <div id="storeModal" :class="{ hidden: search.modal.view === 'closed' }" role="dialog" aria-modal="true"
+  <div id="storeModal" :class="{ hidden: search.modal.view === 'closed', 'anim-hidden': search.modal.view === 'closed' }" role="dialog" aria-modal="true"
     aria-label="作品详情" @click.self="search.closeStoreModal()">
     <div class="sm-box" v-if="search.modal.view !== 'closed'">
-      <button class="sm-close" id="smClose" aria-label="关闭" @click="search.closeStoreModal()">✕</button>
+      <button class="sm-close" id="smClose" aria-label="关闭" @click="search.closeStoreModal()"><AppIcon name="close" /></button>
 
       <template v-if="search.modal.view === 'loading'">
         <p class="store-empty">正在读取作品详情…</p>
@@ -36,11 +52,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
           <div class="grow">
             <div class="sm-title">{{ search.modal.det.name }}</div>
             <div class="sm-meta">{{ CONTENT_TYPES[search.modal.type].label }} · {{ search.modal.source.name }}</div>
-            <div class="sm-meta">
-              {{ search.modal.det.author || search.modal.item?.author || '' }}<template
-                v-if="search.modal.type === 'music'">{{ search.modal.det.duration ? ' · ' + fmtTime(search.modal.det.duration) : '' }}</template><template
-                v-else> · {{ search.modal.det.chapters.length }} {{ CONTENT_TYPES[search.modal.type].part }}</template>
-            </div>
+            <div class="sm-meta">{{ metaLine }}</div>
           </div>
         </div>
         <p class="sm-intro">{{ search.modal.det.intro || search.modal.item?.meta || '暂无简介' }}</p>
@@ -52,9 +64,14 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
         </div>
         <p class="muted detail-note">开始{{ CONTENT_TYPES[search.modal.type].verb }}后自动加入收藏，方便下次继续。<template v-if="search.modal.type === 'novel'">正文按需缓存。</template><template v-else-if="search.modal.type === 'music' && search.modal.det.preview">当前为试听片段。</template></p>
         <button v-if="search.modal.type === 'novel' && search.modal.source.id" class="btn small" id="smCache" :disabled="search.modal.busy" @click="search.cacheButton()">缓存前 50 章</button>
-        <div v-if="search.modal.cache.running || search.modal.cache.done">
-          <div class="prog"><i :style="{ width: (search.modal.cache.done / Math.max(1, search.modal.cache.count) * 100) + '%' }" /></div>
-          <div class="row"><span class="muted grow">已处理 {{ search.modal.cache.done }}/{{ search.modal.cache.count }} 章 · {{ search.modal.cache.failed }} 章失败，目录已保留</span></div>
+        <div id="smProgress">
+          <template v-if="search.modal.cache.running || search.modal.cache.done">
+            <div class="prog"><i :style="{ width: (search.modal.cache.done / Math.max(1, search.modal.cache.count) * 100) + '%' }" /></div>
+            <div class="row">
+              <span class="muted grow">已处理 {{ search.modal.cache.done }}/{{ search.modal.cache.count }} 章 · {{ search.modal.cache.failed }} 章失败，目录已保留</span>
+              <button v-if="search.modal.cache.running" class="btn small" id="smStop" @click="search.modal.cache.stop = true">停止缓存</button>
+            </div>
+          </template>
         </div>
       </template>
     </div>

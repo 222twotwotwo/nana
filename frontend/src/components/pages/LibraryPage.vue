@@ -9,11 +9,17 @@ import { importTxtFile } from '../../services/txt'
 import { addMusicFile } from '../../services/music'
 import { CONTENT_TYPES } from '../../constants'
 import ContentCard from '../common/ContentCard.vue'
+import { useSlidingPill } from '../../composables/useSlidingPill'
 import type { StoreItem, ContentType } from '../../types'
 
 const app = useAppStore()
 const search = useSearchStore()
 const lib = useLibStore()
+
+/* 收藏分类条的滑动高亮（激活项由 search.type 决定） */
+const typeSegRef = ref<HTMLElement | null>(null)
+const { pill: typePill, pillClass: typePillClass, pillActiveClass: typePillActive, sliding: typeSliding } =
+  useSlidingPill(typeSegRef, '.on', 'cat-pill', () => search.type)
 
 const items = ref<StoreItem[]>([])
 const fileImport = ref<HTMLInputElement | null>(null)
@@ -74,7 +80,9 @@ window.addEventListener('moyin:import-txt', () => fileImport.value?.click())
     <div class="page-inner">
       <div class="home-heading">
         <h1 class="big-title">库墙</h1>
-        <div class="category-tabs compact" id="libraryTypeSeg" aria-label="收藏分类" @click="onCategoryClick">
+        <div class="category-tabs compact" id="libraryTypeSeg" ref="typeSegRef"
+          :class="{ [typePillActive]: typeSliding }" aria-label="收藏分类" @click="onCategoryClick">
+          <span :class="typePillClass" ref="typePill" aria-hidden="true" />
           <button v-for="(m, t) in CONTENT_TYPES" :key="t" :data-ctype="t" :class="{ on: search.type === t }"
             :aria-pressed="search.type === t ? 'true' : 'false'">{{ m.label }}</button>
         </div>

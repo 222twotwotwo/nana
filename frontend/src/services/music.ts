@@ -18,7 +18,13 @@ export function musicPageUrl(value?: string) {
   } catch { return '' }
 }
 
-export async function startMusic(music: MusicRecord, resume = true): Promise<boolean> {
+/**
+ * 播放指定曲目。
+ * @param resume   是否从上次进度续播
+ * @param navigate 是否跳到音乐页；悬浮播放器在阅读页切歌时传 false，
+ *                 避免把用户从当前页面拽走（原版无此参数，默认 true 保持原行为）
+ */
+export async function startMusic(music: MusicRecord, resume = true, navigate = true): Promise<boolean> {
   const request = ++player.playRequest
   player.ensureCtx()
   const progress = getProgress()[music.id]
@@ -31,7 +37,7 @@ export async function startMusic(music: MusicRecord, resume = true): Promise<boo
     if (request !== player.playRequest) return false
   }
   musicState.muSelected = music
-  useAppStore().showPage('music')
+  if (navigate) useAppStore().showPage('music')
   const played = await player.crossfadeTo(music)
   if (played) {
     const el = player.activeEl()

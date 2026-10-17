@@ -12,11 +12,17 @@ import { CONTENT_TYPES } from '../../constants'
 import { openCatalogContent } from '../../services/catalog'
 import ContentCard from '../common/ContentCard.vue'
 import CoverBlock from '../common/CoverBlock.vue'
+import { useSlidingPill } from '../../composables/useSlidingPill'
 import type { StoreItem, ContentType } from '../../types'
 
 const app = useAppStore()
 const search = useSearchStore()
 const lib = useLibStore()
+
+/* 搜索分类条的滑动高亮（激活项由 search.type 决定） */
+const typeSegRef = ref<HTMLElement | null>(null)
+const { pill: typePill, pillClass: typePillClass, pillActiveClass: typePillActive, sliding: typeSliding } =
+  useSlidingPill(typeSegRef, '.on', 'cat-pill', () => search.type)
 
 const kwInput = ref<HTMLInputElement | null>(null)
 const items = ref<StoreItem[]>([])
@@ -79,7 +85,9 @@ function onCine() {
     <div class="page-inner" id="homeBox">
       <div class="home-heading">
         <h1 class="big-title">{{ search.discover ? '搜索' : '主页' }}</h1>
-        <div v-if="search.discover" class="category-tabs compact" id="storeTypeSeg" role="tablist" aria-label="搜索分类">
+        <div v-if="search.discover" class="category-tabs compact" id="storeTypeSeg" ref="typeSegRef"
+          :class="{ [typePillActive]: typeSliding }" role="tablist" aria-label="搜索分类">
+          <span :class="typePillClass" ref="typePill" aria-hidden="true" />
           <button v-for="(m, t) in CONTENT_TYPES" :key="t" type="button" :class="{ on: search.type === t }"
             :aria-pressed="search.type === t ? 'true' : 'false'" @click="search.switchType(t as ContentType)">{{ m.label }}</button>
         </div>

@@ -12,6 +12,10 @@
     "web:dev": "npm run dev --prefix frontend",
     "web:build": "npm run build --prefix frontend",
     "web:typecheck": "npm run typecheck --prefix frontend",
+    "verify:motion": "node scripts/verify-motion-static.js && node scripts/verify-motion-behavior.js && node scripts/verify-motion-extra.js && node scripts/verify-motion-overlays.js",
+    "verify:motion:pages": "node scripts/verify-motion-pages.js",
+    "verify:motion:geometry": "node scripts/verify-motion.js",
+    "verify:mobile": "node scripts/verify-mobile-reader.js",
     "check:sources": "node scripts/check-sources.js",
     "audit:upstream": "node scripts/audit-upstream.js"
   },
